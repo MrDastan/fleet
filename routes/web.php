@@ -16,6 +16,7 @@ use App\Http\Controllers\{
     UserController,
     SettingController,
     NotificationController,
+    FileUploadController,
     ProfileController,
 };
 use Illuminate\Support\Facades\Route;
@@ -85,6 +86,9 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
         Route::post('/settings', [SettingController::class, 'store'])->name('settings.store');
     });
+
+    Route::post('/files', [FileUploadController::class, 'store'])->name('files.store');
+    Route::delete('/files/{file}', [FileUploadController::class, 'destroy'])->name('files.destroy');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

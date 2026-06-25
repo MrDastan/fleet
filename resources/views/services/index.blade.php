@@ -101,6 +101,7 @@
                 <div class="modal-close" onclick="closeModal('serviceDetailModal')">✕</div>
             </div>
             <div id="svcDetailBody"></div>
+            <div id="svcDetailFiles"></div>
             <form method="POST" id="svcUpdateForm" style="margin-top:16px">
                 @csrf
                 @method('PUT')
@@ -120,6 +121,12 @@
             </form>
         </div>
     </div>
+
+    @foreach($records as $r)
+    <div id="svc-files-{{ $r->id }}" style="display:none">
+        <x-file-upload type="service" :id="$r->id" :files="$r->files" />
+    </div>
+    @endforeach
 
     <script>
     const servicesData = @json($records->keyBy('id'));
@@ -145,6 +152,9 @@
             ${s.notes ? '<div class="detail-row"><div class="detail-label">Catatan</div><div class="detail-val">' + s.notes + '</div></div>' : ''}
             ${s.items ? '<div style="margin-top:12px;font-size:12px;font-weight:600;color:var(--c-muted)">KERJA SERVIS</div>' + s.items.map(i => '<div style="padding:4px 0;font-size:13px">• ' + i + '</div>').join('') : ''}
         `;
+
+        const filesEl = document.getElementById('svc-files-' + id);
+        document.getElementById('svcDetailFiles').innerHTML = filesEl ? filesEl.innerHTML : '';
 
         document.getElementById('svcUpdateForm').action = '/services/' + id;
         document.getElementById('svcEditStatus').value = s.status;

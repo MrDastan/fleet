@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasFileUploads;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SamanRecord extends Model
 {
+    use HasFileUploads;
     protected $fillable = [
         'vehicle_id', 'driver_user_id', 'saman_no', 'saman_type',
         'offense', 'offense_detail', 'date', 'time', 'location', 'location_detail',

@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasFileUploads;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class FuelRecord extends Model
 {
+    use HasFileUploads;
     protected $fillable = [
         'vehicle_id', 'user_id', 'datetime', 'station', 'fuel_type',
         'liters', 'price_per_liter', 'total_cost', 'odometer_km', 'consumption_l100km',

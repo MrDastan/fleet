@@ -10,7 +10,7 @@ class FuelController extends Controller
 {
     public function index(Request $request)
     {
-        $query = FuelRecord::with(['vehicle', 'driver']);
+        $query = FuelRecord::with(['vehicle', 'driver', 'files']);
 
         if ($vehicleId = $request->input('vehicle_id')) {
             $query->where('vehicle_id', $vehicleId);

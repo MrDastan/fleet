@@ -78,11 +78,13 @@
                         @elseif($r->status === 'dalam_rayuan')<span class="badge-pill badge-warn">Dalam Rayuan</span>
                         @else<span class="badge-pill badge-ok">Telah Bayar</span>@endif
                     </td>
-                    <td>
+                    <td style="white-space:nowrap">
+                        <button class="btn btn-sm btn-secondary" onclick="openSamanDetail({{ $r->id }})">Detail</button>
                         @if($r->status !== 'telah_bayar')
-                            <button class="btn btn-sm btn-primary" onclick="openSamanUpdate({{ $r->id }}, '{{ $r->saman_no }}', '{{ $r->status }}')">Kemaskini</button>
-                        @else
-                            <span style="font-size:11px;color:var(--c-muted)">{{ $r->payment_date?->format('d/m/Y') }}</span>
+                            <button class="btn btn-sm btn-primary" onclick="openSamanUpdate({{ $r->id }}, '{{ $r->saman_no }}', '{{ $r->status }}')">Bayar</button>
+                        @endif
+                        @if($r->files->count())
+                            <span style="font-size:11px;color:var(--c-muted)" title="{{ $r->files->count() }} fail">📎{{ $r->files->count() }}</span>
                         @endif
                     </td>
                 </tr>
@@ -208,7 +210,58 @@
         </div>
     </div>
 
+    <!-- Saman Detail Modal -->
+    <div class="modal-overlay" id="samanDetailModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="sdTitle">Detail Saman</div>
+                <div class="modal-close" onclick="closeModal('samanDetailModal')">✕</div>
+            </div>
+            <div id="sdBody"></div>
+            <div id="sdFiles"></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('samanDetailModal')">Tutup</button></div>
+        </div>
+    </div>
+
+    @foreach($records as $r)
+    <div id="saman-files-{{ $r->id }}" style="display:none">
+        <x-file-upload type="saman" :id="$r->id" :files="$r->files" />
+    </div>
+    @endforeach
+
     <script>
+    const samanData = @json($records->keyBy('id'));
+
+    function openSamanDetail(id) {
+        const s = samanData[id];
+        if (!s) return;
+        const v = s.vehicle;
+        const statusMap = {belum_bayar:'Belum Bayar', dalam_rayuan:'Dalam Rayuan', telah_bayar:'Telah Bayar'};
+        const statusBadge = s.status === 'telah_bayar' ? '<span class="badge-pill badge-ok">Telah Bayar</span>'
+            : s.status === 'dalam_rayuan' ? '<span class="badge-pill badge-warn">Dalam Rayuan</span>'
+            : '<span class="badge-pill badge-danger">Belum Bayar</span>';
+
+        document.getElementById('sdTitle').textContent = '🚦 ' + s.saman_no;
+        document.getElementById('sdBody').innerHTML = `
+            <div class="detail-row"><div class="detail-label">No. Saman</div><div class="detail-val"><strong style="font-family:monospace">${s.saman_no}</strong></div></div>
+            <div class="detail-row"><div class="detail-label">Jenis</div><div class="detail-val">${s.saman_type}</div></div>
+            <div class="detail-row"><div class="detail-label">Kesalahan</div><div class="detail-val">${s.offense}${s.offense_detail ? ' — ' + s.offense_detail : ''}</div></div>
+            <div class="detail-row"><div class="detail-label">Tarikh</div><div class="detail-val">${new Date(s.date).toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'})}${s.time ? ', ' + s.time : ''}</div></div>
+            <div class="detail-row"><div class="detail-label">Lokasi</div><div class="detail-val">${s.location}${s.location_detail ? ', ' + s.location_detail : ''}</div></div>
+            <div class="detail-row"><div class="detail-label">Kenderaan</div><div class="detail-val"><strong>${v.plat}</strong> — ${v.model}</div></div>
+            <div class="detail-row"><div class="detail-label">Pemandu</div><div class="detail-val">${s.driver?.name || '—'}</div></div>
+            <div class="detail-row"><div class="detail-label">Jumlah Denda</div><div class="detail-val"><strong style="color:var(--c-danger);font-size:16px">RM ${parseFloat(s.amount).toFixed(2)}</strong></div></div>
+            <div class="detail-row"><div class="detail-label">Tanggungjawab</div><div class="detail-val">${s.responsibility || '—'}</div></div>
+            <div class="detail-row"><div class="detail-label">Status</div><div class="detail-val">${statusBadge}</div></div>
+            ${s.receipt_no ? '<div class="detail-row"><div class="detail-label">No. Resit</div><div class="detail-val">' + s.receipt_no + '</div></div>' : ''}
+        `;
+
+        const filesEl = document.getElementById('saman-files-' + id);
+        document.getElementById('sdFiles').innerHTML = filesEl ? filesEl.innerHTML : '';
+
+        document.getElementById('samanDetailModal').classList.add('open');
+    }
+
     function openSamanUpdate(id, no, status) {
         document.getElementById('samanUpdateTitle').textContent = 'Kemaskini — ' + no;
         document.getElementById('samanUpdateForm').action = '/saman/' + id;

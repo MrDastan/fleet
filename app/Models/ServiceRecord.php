@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Traits\HasFileUploads;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ServiceRecord extends Model
 {
+    use HasFileUploads;
     protected $fillable = [
         'vehicle_id', 'service_type', 'date', 'workshop',
         'odometer_km', 'cost', 'status', 'notes', 'items',

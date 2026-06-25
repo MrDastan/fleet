@@ -10,7 +10,7 @@ class ServiceController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ServiceRecord::with('vehicle');
+        $query = ServiceRecord::with(['vehicle', 'files']);
 
         if ($status = $request->input('status')) {
             $query->where('status', $status);

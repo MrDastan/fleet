@@ -42,7 +42,7 @@
 
     <div class="card">
         <table class="fleet-table">
-            <thead><tr><th>Tarikh & Masa</th><th>No. Plat</th><th>Pemandu</th><th>Stesen</th><th>Liter</th><th>Harga/L</th><th>Jumlah</th><th>Odometer</th><th>L/100km</th></tr></thead>
+            <thead><tr><th>Tarikh & Masa</th><th>No. Plat</th><th>Pemandu</th><th>Stesen</th><th>Liter</th><th>Harga/L</th><th>Jumlah</th><th>Odometer</th><th>L/100km</th><th></th></tr></thead>
             <tbody>
                 @forelse($records as $r)
                 <tr>
@@ -60,9 +60,13 @@
                             <span style="color:{{ $c > 12 ? 'var(--c-danger)' : ($c > 10 ? 'var(--c-warn)' : 'var(--c-ok)') }};font-weight:600">{{ number_format($c, 1) }}</span>
                         @else — @endif
                     </td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="openFuelDetail({{ $r->id }})">📎</button>
+                        @if($r->files->count())<span style="font-size:10px;color:var(--c-muted)">{{ $r->files->count() }}</span>@endif
+                    </td>
                 </tr>
                 @empty
-                <tr><td colspan="9" style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod bahan api</td></tr>
+                <tr><td colspan="10" style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod bahan api</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -120,7 +124,43 @@
         </div>
     </div>
 
+    <!-- Fuel Detail / Upload Modal -->
+    <div class="modal-overlay" id="fuelDetailModal">
+        <div class="modal" style="max-width:480px">
+            <div class="modal-header">
+                <div class="modal-title" id="fdTitle">📎 Lampiran Resit</div>
+                <div class="modal-close" onclick="closeModal('fuelDetailModal')">✕</div>
+            </div>
+            <div id="fdBody"></div>
+            <div id="fdFiles"></div>
+            <div class="modal-footer"><button class="btn btn-secondary" onclick="closeModal('fuelDetailModal')">Tutup</button></div>
+        </div>
+    </div>
+
+    @foreach($records as $r)
+    <div id="fuel-files-{{ $r->id }}" style="display:none">
+        <x-file-upload type="fuel" :id="$r->id" :files="$r->files" />
+    </div>
+    @endforeach
+
     <script>
+    const fuelData = @json($records->keyBy('id'));
+
+    function openFuelDetail(id) {
+        const f = fuelData[id];
+        if (!f) return;
+        document.getElementById('fdTitle').textContent = '📎 Resit — ' + f.vehicle.plat + ' (' + new Date(f.datetime).toLocaleDateString('ms-MY') + ')';
+        document.getElementById('fdBody').innerHTML = `
+            <div class="detail-row"><div class="detail-label">Kenderaan</div><div class="detail-val"><strong>${f.vehicle.plat}</strong> — ${f.vehicle.model}</div></div>
+            <div class="detail-row"><div class="detail-label">Tarikh</div><div class="detail-val">${new Date(f.datetime).toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'})}</div></div>
+            <div class="detail-row"><div class="detail-label">Stesen</div><div class="detail-val">${f.station || '—'}</div></div>
+            <div class="detail-row"><div class="detail-label">Jumlah</div><div class="detail-val"><strong>RM ${parseFloat(f.total_cost).toFixed(2)}</strong> (${parseFloat(f.liters).toFixed(1)}L)</div></div>
+        `;
+        const filesEl = document.getElementById('fuel-files-' + id);
+        document.getElementById('fdFiles').innerHTML = filesEl ? filesEl.innerHTML : '';
+        document.getElementById('fuelDetailModal').classList.add('open');
+    }
+
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }
     document.querySelectorAll('.modal-overlay').forEach(o => { o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }); });
     </script>

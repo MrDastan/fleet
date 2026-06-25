@@ -10,7 +10,7 @@ class SamanController extends Controller
 {
     public function index(Request $request)
     {
-        $query = SamanRecord::with(['vehicle', 'driver']);
+        $query = SamanRecord::with(['vehicle', 'driver', 'files']);
 
         if ($status = $request->input('status')) {
             $query->where('status', $status);
