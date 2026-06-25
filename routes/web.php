@@ -47,6 +47,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/saman/{saman}', [SamanController::class, 'update'])->name('saman.update');
 
     Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
+    Route::post('/approvals', [ApprovalController::class, 'store'])->name('approvals.store');
+    Route::put('/approvals/{approval}/guard', [ApprovalController::class, 'guardAction'])->name('approvals.guard');
+    Route::put('/approvals/{approval}/fleet', [ApprovalController::class, 'fleetAction'])->name('approvals.fleet');
+    Route::put('/approvals/{approval}/override', [ApprovalController::class, 'adminOverride'])->name('approvals.override');
+    Route::put('/approvals/{approval}/complete', [ApprovalController::class, 'complete'])->name('approvals.complete');
 
     Route::get('/reminders', [ReminderController::class, 'index'])->name('reminders.index');
 
