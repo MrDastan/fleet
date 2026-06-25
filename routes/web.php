@@ -58,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     Route::get('/anomalies', [AnomalyController::class, 'index'])->name('anomalies.index');
+    Route::post('/anomalies/scan', [AnomalyController::class, 'scan'])->name('anomalies.scan');
+    Route::put('/anomalies/{anomaly}/resolve', [AnomalyController::class, 'resolve'])->name('anomalies.resolve');
+    Route::put('/anomalies/{anomaly}/investigate', [AnomalyController::class, 'investigate'])->name('anomalies.investigate');
 
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
