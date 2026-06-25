@@ -63,6 +63,7 @@ class VehicleController extends Controller
             'odometer_km' => 'nullable|integer',
             'roadtax_expiry' => 'nullable|date',
             'insurance_expiry' => 'nullable|date',
+            'status' => 'nullable|in:aktif,servis,rosak,tidak_aktif',
         ]);
 
         $vehicle->update($validated);

@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
     Route::post('/services', [ServiceController::class, 'store'])->name('services.store');
+    Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
 
     Route::get('/roadtax', [RoadtaxController::class, 'index'])->name('roadtax.index');
 

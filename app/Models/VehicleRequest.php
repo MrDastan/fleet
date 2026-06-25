@@ -37,7 +37,7 @@ class VehicleRequest extends Model
         return $this->belongsTo(Vehicle::class);
     }
 
-    public function guard(): BelongsTo
+    public function guardUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'guard_user_id');
     }
