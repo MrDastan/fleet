@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\VehicleRequest;
 use App\Models\Vehicle;
+use App\Notifications\ApprovalNotification;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 
 class ApprovalController extends Controller
 {
@@ -60,7 +63,10 @@ class ApprovalController extends Controller
         $validated['status'] = 'pending_guard';
         $validated['stage'] = 1;
 
-        VehicleRequest::create($validated);
+        $vr = VehicleRequest::create($validated);
+
+        $guards = User::role('guard')->get();
+        Notification::send($guards, new ApprovalNotification($vr->load(['requester', 'vehicle']), 'submitted'));
 
         return redirect()->route('approvals.index')->with('success', 'Permohonan dihantar. Menunggu pengesahan penjaga.');
     }
@@ -79,6 +85,9 @@ class ApprovalController extends Controller
                 'guard_odometer' => $request->input('guard_odometer'),
                 'guard_action_at' => now(),
             ]);
+            $fleetUsers = User::role('fleet')->get();
+            Notification::send($fleetUsers, new ApprovalNotification($approval->load(['requester', 'vehicle']), 'guard_approved'));
+
             return redirect()->route('approvals.index')->with('success', 'Disahkan oleh penjaga. Dihantar ke Fleet untuk kelulusan.');
         }
 
@@ -105,6 +114,8 @@ class ApprovalController extends Controller
                 'fleet_priority' => $request->input('fleet_priority'),
                 'fleet_action_at' => now(),
             ]);
+            $approval->requester->notify(new ApprovalNotification($approval->load(['requester', 'vehicle']), 'fleet_approved'));
+
             return redirect()->route('approvals.index')->with('success', 'Permohonan diluluskan oleh Fleet.');
         }
 

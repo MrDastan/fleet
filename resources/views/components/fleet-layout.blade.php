@@ -59,9 +59,14 @@
             <div class="topbar-title">{{ $title ?? 'Dashboard' }}</div>
         </div>
         <div class="topbar-right">
-            <a href="{{ route('reminders.index') }}" class="topbar-notif" title="Peringatan">
+            <a href="{{ route('notifications.index') }}" class="topbar-notif" title="Notifikasi">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                <div class="notif-dot"></div>
+                @if(auth()->user()->unreadNotifications()->count() > 0)
+                    <div class="notif-dot"></div>
+                @endif
+            </a>
+            <a href="{{ route('reminders.index') }}" class="topbar-notif" title="Peringatan">
+                <span style="font-size:16px">🔔</span>
             </a>
             <div class="topbar-user" onclick="document.getElementById('logoutDropdown').classList.toggle('show')">
                 <div class="avatar">{{ auth()->user()->avatar_initials ?? 'U' }}</div>
