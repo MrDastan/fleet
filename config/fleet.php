@@ -19,6 +19,7 @@ return [
             ['section' => 'ADMIN', 'items' => [
                 ['route' => 'reports.index', 'icon' => '📊', 'label' => 'Laporan'],
                 ['route' => 'anomalies.index', 'icon' => '🧠', 'label' => 'Pengesanan Anomali', 'badge' => '3', 'badgeType' => 'danger'],
+                ['route' => 'qr.index', 'icon' => '📲', 'label' => 'QR Kenderaan'],
                 ['route' => 'users.index', 'icon' => '👥', 'label' => 'Pengguna'],
                 ['route' => 'settings.index', 'icon' => '⚙️', 'label' => 'Tetapan'],
             ]],

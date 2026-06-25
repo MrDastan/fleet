@@ -12,6 +12,7 @@ use App\Http\Controllers\{
     ReminderController,
     ReportController,
     AnomalyController,
+    QrController,
     UserController,
     SettingController,
     ProfileController,
@@ -19,6 +20,9 @@ use App\Http\Controllers\{
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn() => redirect()->route('login'));
+
+Route::get('/qr/scan/{token}', [QrController::class, 'scan'])->name('qr.scan');
+Route::post('/qr/scan/{token}', [QrController::class, 'scanAction'])->middleware('auth')->name('qr.scan.action');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
@@ -56,11 +60,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reminders', [ReminderController::class, 'index'])->name('reminders.index');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/monthly', [ReportController::class, 'monthly'])->name('reports.monthly');
+    Route::get('/reports/cost', [ReportController::class, 'cost'])->name('reports.cost');
+    Route::get('/reports/compliance', [ReportController::class, 'compliance'])->name('reports.compliance');
 
     Route::get('/anomalies', [AnomalyController::class, 'index'])->name('anomalies.index');
     Route::post('/anomalies/scan', [AnomalyController::class, 'scan'])->name('anomalies.scan');
     Route::put('/anomalies/{anomaly}/resolve', [AnomalyController::class, 'resolve'])->name('anomalies.resolve');
     Route::put('/anomalies/{anomaly}/investigate', [AnomalyController::class, 'investigate'])->name('anomalies.investigate');
+
+    Route::get('/qr', [QrController::class, 'index'])->name('qr.index');
+    Route::get('/qr/generate/{vehicle}', [QrController::class, 'generate'])->name('qr.generate');
 
     Route::middleware(['role:admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index'])->name('users.index');
