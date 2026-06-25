@@ -33,13 +33,18 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/services/{service}', [ServiceController::class, 'update'])->name('services.update');
 
     Route::get('/roadtax', [RoadtaxController::class, 'index'])->name('roadtax.index');
+    Route::post('/roadtax', [RoadtaxController::class, 'store'])->name('roadtax.store');
 
     Route::get('/fuel', [FuelController::class, 'index'])->name('fuel.index');
     Route::post('/fuel', [FuelController::class, 'store'])->name('fuel.store');
 
     Route::get('/movements', [MovementController::class, 'index'])->name('movements.index');
+    Route::post('/movements', [MovementController::class, 'store'])->name('movements.store');
+    Route::put('/movements/{movement}/checkin', [MovementController::class, 'checkin'])->name('movements.checkin');
 
     Route::get('/saman', [SamanController::class, 'index'])->name('saman.index');
+    Route::post('/saman', [SamanController::class, 'store'])->name('saman.store');
+    Route::put('/saman/{saman}', [SamanController::class, 'update'])->name('saman.update');
 
     Route::get('/approvals', [ApprovalController::class, 'index'])->name('approvals.index');
 
