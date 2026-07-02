@@ -1,46 +1,42 @@
 <x-fleet-layout title="Pengurusan Saman">
     <div class="page-header">
-        <h2>Pengurusan Saman</h2>
-        <p>Rekod dan pemantauan saman trafik, parkir & kesalahan lain bagi semua kenderaan syarikat</p>
+        <h1>Pengurusan Saman</h1>
+        <p>Saman trafik & kompaun kenderaan syarikat</p>
     </div>
 
     @if($unpaidCount > 0)
     <div class="alert alert-danger">
-        <span>🚨</span>
+        <x-icon name="triangle-alert" :size="16" />
         <div><strong>{{ $unpaidCount }} saman belum dijelaskan.</strong> Jumlah tertunggak: <strong>RM {{ number_format($unpaidTotal) }}</strong>. Saman melebihi 30 hari boleh dikenakan denda tambahan.</div>
     </div>
     @endif
 
-    <div class="stats-grid" style="margin-bottom:20px">
-        <a href="{{ route('saman.index', ['status' => 'belum_bayar']) }}" class="stat-card" style="border-top:3px solid var(--c-danger);text-decoration:none">
-            <div class="stat-icon" style="background:#ffe8e8">🚨</div>
-            <div class="stat-val" style="color:var(--c-danger)">{{ $unpaidCount }}</div>
-            <div class="stat-label">Belum Dijelaskan</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px">
+        <a href="{{ route('saman.index', ['status' => 'belum_bayar']) }}" class="stat-card" style="text-decoration:none">
+            <div class="stat-label">Belum Bayar</div>
+            <div class="stat-val" style="color:var(--danger-text);margin-top:8px">{{ $unpaidCount }}</div>
             <div class="stat-sub red">RM {{ number_format($unpaidTotal) }} tertunggak</div>
         </a>
-        <a href="{{ route('saman.index', ['status' => 'dalam_rayuan']) }}" class="stat-card" style="border-top:3px solid var(--c-warn);text-decoration:none">
-            <div class="stat-icon" style="background:#fff3e0">⏳</div>
-            <div class="stat-val" style="color:var(--c-warn)">{{ $appealCount }}</div>
+        <a href="{{ route('saman.index', ['status' => 'dalam_rayuan']) }}" class="stat-card" style="text-decoration:none">
             <div class="stat-label">Dalam Rayuan</div>
+            <div class="stat-val" style="color:var(--warn-text);margin-top:8px">{{ $appealCount }}</div>
             <div class="stat-sub orange">RM {{ number_format($appealTotal) }} dalam semakan</div>
         </a>
-        <a href="{{ route('saman.index', ['status' => 'telah_bayar']) }}" class="stat-card" style="border-top:3px solid var(--c-ok);text-decoration:none">
-            <div class="stat-icon" style="background:#e8fff6">✅</div>
-            <div class="stat-val" style="color:var(--c-ok)">{{ $paidCount }}</div>
+        <a href="{{ route('saman.index', ['status' => 'telah_bayar']) }}" class="stat-card" style="text-decoration:none">
             <div class="stat-label">Telah Dijelaskan</div>
+            <div class="stat-val" style="color:var(--ok);margin-top:8px">{{ $paidCount }}</div>
             <div class="stat-sub green">RM {{ number_format($paidTotal) }} tahun ini</div>
         </a>
-        <a href="{{ route('saman.index') }}" class="stat-card" style="border-top:3px solid var(--c-sky);text-decoration:none">
-            <div class="stat-icon" style="background:#fff0e8">📋</div>
-            <div class="stat-val">{{ $totalAll }}</div>
+        <a href="{{ route('saman.index') }}" class="stat-card" style="text-decoration:none">
             <div class="stat-label">Jumlah Saman</div>
-            <div class="stat-sub" style="color:var(--c-muted)">RM {{ number_format($totalAmount) }} jumlah</div>
+            <div class="stat-val" style="margin-top:8px">{{ $totalAll }}</div>
+            <div class="stat-sub" style="color:var(--muted)">RM {{ number_format($totalAmount) }} jumlah</div>
         </a>
     </div>
 
     <div class="search-bar">
         <form method="GET" action="{{ route('saman.index') }}" style="display:flex;gap:10px;flex:1;flex-wrap:wrap">
-            <input type="text" name="search" class="form-control search-input" placeholder="🔍  Cari no. plat, no. saman..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control search-input" placeholder="Cari no. plat, no. saman..." value="{{ request('search') }}">
             <select name="status" class="form-control" style="width:150px" onchange="this.form.submit()">
                 <option value="">Semua Status</option>
                 <option value="belum_bayar" {{ request('status') === 'belum_bayar' ? 'selected' : '' }}>Belum Bayar</option>
@@ -54,7 +50,7 @@
                 @endforeach
             </select>
         </form>
-        <button class="btn btn-primary" onclick="document.getElementById('addSamanModal').classList.add('open')">+ Rekod Saman</button>
+        <button class="btn btn-primary" onclick="document.getElementById('addSamanModal').classList.add('open')"><x-icon name="plus" :size="16" /> Rekod Saman</button>
     </div>
 
     <div class="card mb20">
@@ -84,7 +80,7 @@
                             <button class="btn btn-sm btn-primary" onclick="openSamanUpdate({{ $r->id }}, '{{ $r->saman_no }}', '{{ $r->status }}')">Bayar</button>
                         @endif
                         @if($r->files->count())
-                            <span style="font-size:11px;color:var(--c-muted)" title="{{ $r->files->count() }} fail">📎{{ $r->files->count() }}</span>
+                            <span style="font-size:11px;color:var(--muted)" title="{{ $r->files->count() }} fail">{{ $r->files->count() }} fail</span>
                         @endif
                     </td>
                 </tr>
@@ -98,7 +94,7 @@
     <!-- Summary by vehicle -->
     @if($byVehicle->count())
     <div class="card">
-        <div class="card-header"><span class="card-title">📊 Saman Mengikut Kenderaan</span></div>
+        <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="bar-chart-3" :size="17" /></span>Saman Mengikut Kenderaan</span></div>
         <div class="card-body">
             @foreach($byVehicle as $bv)
                 @php $pct = $totalAmount > 0 ? ($bv->total / $totalAmount) * 100 : 0; @endphp
@@ -120,7 +116,7 @@
     <div class="modal-overlay" id="addSamanModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">🚨 Rekod Saman Baharu</div>
+                <div class="modal-title"><x-icon name="triangle-alert" :size="18" /> Rekod Saman Baharu</div>
                 <div class="modal-close" onclick="closeModal('addSamanModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('saman.store') }}">
@@ -241,7 +237,7 @@
             : s.status === 'dalam_rayuan' ? '<span class="badge-pill badge-warn">Dalam Rayuan</span>'
             : '<span class="badge-pill badge-danger">Belum Bayar</span>';
 
-        document.getElementById('sdTitle').textContent = '🚦 ' + s.saman_no;
+        document.getElementById('sdTitle').textContent = s.saman_no;
         document.getElementById('sdBody').innerHTML = `
             <div class="detail-row"><div class="detail-label">No. Saman</div><div class="detail-val"><strong style="font-family:monospace">${s.saman_no}</strong></div></div>
             <div class="detail-row"><div class="detail-label">Jenis</div><div class="detail-val">${s.saman_type}</div></div>

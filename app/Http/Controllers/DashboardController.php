@@ -8,6 +8,7 @@ use App\Models\FuelRecord;
 use App\Models\MovementLog;
 use App\Models\ServiceRecord;
 use App\Models\VehicleRequest;
+use App\Models\AnomalyRecord;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -41,12 +42,33 @@ class DashboardController extends Controller
 
         $servicesInProgress = ServiceRecord::where('status', 'dalam_proses')->with('vehicle')->get();
 
+        $anomalyWeekCount = AnomalyRecord::where('status', '!=', 'resolved')
+            ->where('created_at', '>=', now()->subDays(7))->count();
+        $topAnomaly = AnomalyRecord::where('status', '!=', 'resolved')
+            ->with('vehicle')
+            ->orderByRaw("FIELD(severity,'critical','warning','info')")
+            ->latest()->first();
+
+        $vehicleTrend = collect(range(5, 0))->map(
+            fn($i) => Vehicle::where('created_at', '<=', now()->copy()->subMonths($i)->endOfMonth())->count()
+        )->values()->all();
+
+        $fuelMonthly = collect(range(5, 0))->map(function ($i) {
+            $m = now()->copy()->subMonths($i);
+            return [
+                'label' => ucfirst($m->translatedFormat('M')),
+                'total' => (float) FuelRecord::whereMonth('datetime', $m->month)->whereYear('datetime', $m->year)->sum('total_cost'),
+                'current' => $i === 0,
+            ];
+        });
+
         return view('dashboard.index', compact(
             'vehicles', 'totalVehicles', 'activeVehicles', 'inService',
             'needsAttention', 'urgentCount', 'unpaidSaman', 'unpaidSamanTotal',
             'samanList', 'urgentVehicles', 'recentMovements',
             'fuelTotal', 'fuelLiters', 'fuelAvg',
-            'pendingApprovals', 'servicesInProgress'
+            'pendingApprovals', 'servicesInProgress',
+            'anomalyWeekCount', 'topAnomaly', 'vehicleTrend', 'fuelMonthly'
         ));
     }
 }

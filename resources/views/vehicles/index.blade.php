@@ -1,60 +1,79 @@
+@php
+    $dc = fn($days) => $days <= 7 ? 'var(--danger-text)' : ($days <= 30 ? 'var(--warn-text)' : 'var(--ok)');
+    $isTruck = function ($v) {
+        $s = strtolower($v->type . ' ' . $v->model);
+        foreach (['truck', 'lori', 'pickup', 'pikap', 'van', 'd-max', 'hilux', 'triton', 'navara'] as $kw) {
+            if (str_contains($s, $kw)) return true;
+        }
+        return false;
+    };
+    $chips = [
+        ['status' => null, 'label' => 'Semua'],
+        ['status' => 'aktif', 'label' => 'Aktif'],
+        ['status' => 'servis', 'label' => 'Dalam Servis'],
+        ['status' => 'rosak', 'label' => 'Rosak'],
+    ];
+@endphp
 <x-fleet-layout title="Senarai Kenderaan">
     <div class="page-header">
-        <h2>Senarai Kenderaan</h2>
-        <p>Semua kenderaan syarikat beserta status terkini</p>
+        <h1>Senarai Kenderaan</h1>
+        <p>{{ \App\Models\Vehicle::count() }} kenderaan syarikat · {{ $vehicles->count() }} dipaparkan</p>
     </div>
 
-    <div class="search-bar">
-        <form method="GET" action="{{ route('vehicles.index') }}" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex:1">
-            <input type="text" name="search" class="form-control search-input" placeholder="🔍  Cari nombor plat, model..." value="{{ request('search') }}">
-            <select name="status" class="form-control" style="width:160px" onchange="this.form.submit()">
-                <option value="">Semua Status</option>
-                <option value="aktif" {{ request('status') === 'aktif' ? 'selected' : '' }}>Aktif</option>
-                <option value="servis" {{ request('status') === 'servis' ? 'selected' : '' }}>Dalam Servis</option>
-                <option value="rosak" {{ request('status') === 'rosak' ? 'selected' : '' }}>Rosak</option>
-            </select>
-        </form>
+    <form method="GET" action="{{ route('vehicles.index') }}" style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px">
+        <input type="text" name="search" class="form-control" style="max-width:260px" placeholder="Cari nombor plat, model..." value="{{ request('search') }}">
+        <button type="submit" class="btn btn-secondary btn-sm">Cari</button>
+    </form>
+
+    <div class="chip-row">
+        @foreach($chips as $c)
+            <a href="{{ route('vehicles.index', array_filter(['status' => $c['status'], 'search' => request('search')])) }}"
+               class="chip {{ request('status') === $c['status'] ? 'active' : '' }}">{{ $c['label'] }}</a>
+        @endforeach
         @can('create', App\Models\Vehicle::class)
-        <button class="btn btn-primary" onclick="document.getElementById('addVehicleModal').classList.add('open')">+ Tambah Kenderaan</button>
+        <button class="btn btn-primary" style="margin-left:auto" onclick="document.getElementById('addVehicleModal').classList.add('open')"><x-icon name="plus" :size="16" /> Tambah Kenderaan</button>
         @endcan
     </div>
 
     <div class="vehicle-grid">
         @foreach($vehicles as $v)
             @php
-                $rtColor = $v->roadtax_days <= 7 ? 'var(--c-danger)' : ($v->roadtax_days <= 30 ? 'var(--c-warn)' : 'var(--c-ok)');
-                $insColor = $v->insurance_days <= 7 ? 'var(--c-danger)' : ($v->insurance_days <= 30 ? 'var(--c-warn)' : 'var(--c-ok)');
-                $srvDays = $v->next_service_date ? (int) now()->diffInDays($v->next_service_date, false) : 999;
-                $srvColor = $srvDays <= 14 ? 'var(--c-warn)' : 'var(--c-ok)';
+                $truck = $isTruck($v);
+                $tileClass = $truck ? 'background:#EDEAE3;color:#5A544B' : 'background:#FCEBE0;color:#C0480A';
+                $srvDays = $v->next_service_date ? (int) now()->diffInDays($v->next_service_date, false) : null;
             @endphp
-            <div class="vehicle-card" onclick="openEditVehicle({{ $v->id }})" style="cursor:pointer">
-                <div class="vehicle-img">{{ $v->emoji }}</div>
-                <div style="display:flex;justify-content:space-between;align-items:flex-start">
-                    <div>
-                        <div class="vehicle-plat">{{ $v->plat }}</div>
-                        <div class="vehicle-model">{{ $v->model }} {{ $v->year }}</div>
-                    </div>
-                    @if($v->status === 'servis')
-                        <span class="badge-pill badge-warn">Dalam Servis</span>
-                    @elseif($v->status === 'rosak')
-                        <span class="badge-pill badge-danger">Rosak</span>
-                    @else
-                        <span class="badge-pill badge-ok">Aktif</span>
-                    @endif
+            <div class="vehicle-card" onclick="openEditVehicle({{ $v->id }})">
+                <div class="vehicle-tile" style="{{ $tileClass }}">
+                    <x-icon :name="$truck ? 'truck' : 'car'" :size="42" :stroke="1.5" />
+                    <span class="status-badge">
+                        @if($v->status === 'servis')
+                            <span class="badge-pill badge-warn">Servis</span>
+                        @elseif($v->status === 'rosak')
+                            <span class="badge-pill badge-danger">Rosak</span>
+                        @else
+                            <span class="badge-pill badge-ok">Aktif</span>
+                        @endif
+                    </span>
                 </div>
-                <div style="font-size:11px;color:var(--c-muted);margin-top:4px">📁 {{ $v->department ?? '—' }} &nbsp;|&nbsp; {{ number_format($v->odometer_km) }} km</div>
-                <div class="vehicle-stats">
-                    <div class="vehicle-stat">
-                        <div class="val" style="color:{{ $rtColor }}">{{ $v->roadtax_days }}h</div>
-                        <div class="lbl">Road Tax</div>
+                <div class="vehicle-card-body">
+                    <div class="vehicle-card-top">
+                        <span class="vehicle-plat">{{ $v->plat }}</span>
+                        <span class="vehicle-km">{{ number_format($v->odometer_km) }} km</span>
                     </div>
-                    <div class="vehicle-stat">
-                        <div class="val" style="color:{{ $insColor }}">{{ $v->insurance_days }}h</div>
-                        <div class="lbl">Insuran</div>
-                    </div>
-                    <div class="vehicle-stat">
-                        <div class="val" style="color:{{ $srvColor }}">{{ $srvDays < 999 ? $srvDays . 'h' : '—' }}</div>
-                        <div class="lbl">Servis</div>
+                    <div class="vehicle-model">{{ $v->model }} {{ $v->year }} · {{ $v->department ?? '—' }}</div>
+                    <div class="vehicle-stats">
+                        <div class="vehicle-stat">
+                            <div class="val" style="color:{{ $dc($v->roadtax_days) }}">{{ $v->roadtax_days }}h</div>
+                            <div class="lbl">Road Tax</div>
+                        </div>
+                        <div class="vehicle-stat">
+                            <div class="val" style="color:{{ $dc($v->insurance_days) }}">{{ $v->insurance_days }}h</div>
+                            <div class="lbl">Insuran</div>
+                        </div>
+                        <div class="vehicle-stat">
+                            <div class="val" style="color:{{ $srvDays !== null ? $dc($srvDays) : 'var(--muted)' }}">{{ $srvDays !== null ? $srvDays . 'h' : '—' }}</div>
+                            <div class="lbl">Servis</div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,8 +81,8 @@
     </div>
 
     @if($vehicles->isEmpty())
-        <div style="text-align:center;padding:40px;color:var(--c-muted)">
-            <div style="font-size:48px;margin-bottom:12px;opacity:0.3">🚗</div>
+        <div style="text-align:center;padding:40px;color:var(--muted)">
+            <div style="margin-bottom:12px;opacity:0.3;display:flex;justify-content:center"><x-icon name="car" :size="48" :stroke="1.3" /></div>
             <p>Tiada kenderaan dijumpai</p>
         </div>
     @endif
@@ -72,7 +91,7 @@
     <div class="modal-overlay" id="addVehicleModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">🚗 Tambah Kenderaan Baharu</div>
+                <div class="modal-title"><x-icon name="car" :size="18" /> Tambah Kenderaan Baharu</div>
                 <div class="modal-close" onclick="closeModal('addVehicleModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('vehicles.store') }}">
@@ -90,7 +109,7 @@
     <div class="modal-overlay" id="editVehicleModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">✏️ Kemaskini Kenderaan</div>
+                <div class="modal-title"><x-icon name="wrench" :size="18" /> Kemaskini Kenderaan</div>
                 <div class="modal-close" onclick="closeModal('editVehicleModal')">✕</div>
             </div>
             <form method="POST" id="editVehicleForm">

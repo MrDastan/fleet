@@ -1,113 +1,128 @@
+@php
+    $sevMeta = [
+        'critical' => ['accent' => 'var(--danger-text)', 'soft' => 'soft-danger', 'badge' => 'badge-danger', 'label' => 'Keutamaan Tinggi', 'conf' => 92, 'icon' => 'triangle-alert'],
+        'warning' => ['accent' => 'var(--warn-text)', 'soft' => 'soft-warn', 'badge' => 'badge-warn', 'label' => 'Sederhana', 'conf' => 76, 'icon' => 'triangle-alert'],
+        'info' => ['accent' => 'var(--info)', 'soft' => 'soft-info', 'badge' => 'badge-info', 'label' => 'Info', 'conf' => 58, 'icon' => 'eye'],
+    ];
+    $ruleIcons = [
+        'FUEL_HIGH' => 'fuel', 'MILEAGE_JUMP' => 'route', 'FREQ_REFUEL' => 'fuel',
+        'SERVICE_OVERDUE' => 'wrench', 'NO_APPROVAL' => 'clipboard-check',
+        'AFTER_HOURS' => 'clock', 'WEEKEND_USE' => 'calendar',
+    ];
+@endphp
 <x-fleet-layout title="Pengesanan Anomali">
-    <div class="page-header">
-        <h2>Pengesanan Anomali</h2>
-        <p>Sistem pengesanan automatik tingkah laku luar biasa dalam penggunaan kenderaan</p>
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <div style="width:40px;height:40px;border-radius:11px;background:var(--sidebar);color:var(--accent-light);display:flex;align-items:center;justify-content:center"><x-icon name="sparkles" :size="20" /></div>
+        <div>
+            <h1 style="margin:0">Pengesanan Anomali AI</h1>
+            <p style="font-size:13px;color:var(--muted);margin:4px 0 0">Model mempelajari corak biasa setiap kenderaan & memberi amaran anomali</p>
+        </div>
     </div>
 
-    <!-- Stats -->
-    <div class="stats-grid" style="margin-bottom:20px">
-        <a href="{{ route('anomalies.index', ['severity' => 'critical']) }}" class="stat-card" style="border-top:3px solid var(--c-danger);text-decoration:none">
-            <div class="stat-icon" style="background:#ffe8e8">🚨</div>
-            <div class="stat-val" style="color:var(--c-danger)">{{ $counts['critical'] }}</div>
-            <div class="stat-label">Kritikal</div>
-            @if($counts['critical'] > 0)<div class="stat-sub red">Perlu tindakan segera</div>@endif
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin:20px 0">
+        <a href="{{ route('anomalies.index', ['severity' => 'critical']) }}" class="stat-card" style="text-decoration:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;color:var(--danger-text)"><x-icon name="triangle-alert" :size="18" :stroke="1.9" /><span style="font-size:11.5px;color:var(--muted);font-weight:500">Kritikal</span></div>
+            <div class="stat-val">{{ $counts['critical'] }}</div>
         </a>
-        <a href="{{ route('anomalies.index', ['severity' => 'warning']) }}" class="stat-card" style="border-top:3px solid var(--c-warn);text-decoration:none">
-            <div class="stat-icon" style="background:#fff3e0">⚠️</div>
-            <div class="stat-val" style="color:var(--c-warn)">{{ $counts['warning'] }}</div>
-            <div class="stat-label">Amaran</div>
-            @if($counts['warning'] > 0)<div class="stat-sub orange">Perlu disemak</div>@endif
+        <a href="{{ route('anomalies.index', ['severity' => 'warning']) }}" class="stat-card" style="text-decoration:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;color:var(--warn-text)"><x-icon name="triangle-alert" :size="18" :stroke="1.9" /><span style="font-size:11.5px;color:var(--muted);font-weight:500">Amaran</span></div>
+            <div class="stat-val">{{ $counts['warning'] }}</div>
         </a>
-        <a href="{{ route('anomalies.index', ['severity' => 'info']) }}" class="stat-card" style="border-top:3px solid #1a4fa0;text-decoration:none">
-            <div class="stat-icon" style="background:#e8f0fb">🔍</div>
-            <div class="stat-val" style="color:#1a4fa0">{{ $counts['info'] }}</div>
-            <div class="stat-label">Diperhatikan</div>
+        <a href="{{ route('anomalies.index', ['severity' => 'info']) }}" class="stat-card" style="text-decoration:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;color:var(--accent-dark)"><x-icon name="activity" :size="18" :stroke="1.9" /><span style="font-size:11.5px;color:var(--muted);font-weight:500">Diperhatikan</span></div>
+            <div class="stat-val">{{ $counts['info'] }}</div>
         </a>
-        <a href="{{ route('anomalies.index', ['severity' => 'resolved']) }}" class="stat-card" style="border-top:3px solid var(--c-ok);text-decoration:none">
-            <div class="stat-icon" style="background:#e8fff6">✅</div>
-            <div class="stat-val" style="color:var(--c-ok)">{{ $counts['resolved'] }}</div>
-            <div class="stat-label">Diselesaikan</div>
+        <a href="{{ route('anomalies.index', ['severity' => 'resolved']) }}" class="stat-card" style="text-decoration:none">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;color:var(--ok)"><x-icon name="shield" :size="18" :stroke="1.9" /><span style="font-size:11.5px;color:var(--muted);font-weight:500">Diselesaikan</span></div>
+            <div class="stat-val">{{ $counts['resolved'] }}</div>
         </a>
     </div>
 
     <!-- Engine status -->
-    <div style="display:flex;align-items:center;justify-content:space-between;background:#e8fff6;border:1px solid #a8dfc8;border-radius:10px;padding:12px 18px;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+    <div style="display:flex;align-items:center;justify-content:space-between;background:#E3F2EA;border:1px solid #B9DFC9;border-radius:12px;padding:12px 18px;margin-bottom:20px;flex-wrap:wrap;gap:10px">
         <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:10px;height:10px;border-radius:50%;background:var(--c-ok);box-shadow:0 0 0 3px #d4faf0"></div>
+            <div style="width:10px;height:10px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px rgba(19,112,73,.18)"></div>
             <div>
-                <div style="font-size:13px;font-weight:600;color:#007a5e">Enjin Anomali Aktif</div>
-                <div style="font-size:11px;color:var(--c-muted)">{{ count($rules) }} peraturan aktif</div>
+                <div style="font-size:13px;font-weight:600;color:var(--ok)">Enjin Anomali Aktif</div>
+                <div style="font-size:11px;color:var(--muted)">{{ count($rules) }} peraturan aktif</div>
             </div>
         </div>
         <form method="POST" action="{{ route('anomalies.scan') }}">
             @csrf
-            <button type="submit" class="btn btn-sm btn-secondary">🔄 Imbas Sekarang</button>
+            <button type="submit" class="btn btn-sm btn-secondary">Imbas Sekarang</button>
         </form>
     </div>
 
     <!-- Tabs -->
     <div class="tabs">
         <a href="{{ route('anomalies.index') }}" class="tab {{ !request('severity') ? 'active' : '' }}">Semua</a>
-        <a href="{{ route('anomalies.index', ['severity' => 'critical']) }}" class="tab {{ request('severity') === 'critical' ? 'active' : '' }}">🚨 Kritikal</a>
-        <a href="{{ route('anomalies.index', ['severity' => 'warning']) }}" class="tab {{ request('severity') === 'warning' ? 'active' : '' }}">⚠️ Amaran</a>
-        <a href="{{ route('anomalies.index', ['severity' => 'info']) }}" class="tab {{ request('severity') === 'info' ? 'active' : '' }}">🔍 Diperhatikan</a>
-        <a href="{{ route('anomalies.index', ['severity' => 'resolved']) }}" class="tab {{ request('severity') === 'resolved' ? 'active' : '' }}">✅ Selesai</a>
+        <a href="{{ route('anomalies.index', ['severity' => 'critical']) }}" class="tab {{ request('severity') === 'critical' ? 'active' : '' }}">Kritikal</a>
+        <a href="{{ route('anomalies.index', ['severity' => 'warning']) }}" class="tab {{ request('severity') === 'warning' ? 'active' : '' }}">Amaran</a>
+        <a href="{{ route('anomalies.index', ['severity' => 'info']) }}" class="tab {{ request('severity') === 'info' ? 'active' : '' }}">Diperhatikan</a>
+        <a href="{{ route('anomalies.index', ['severity' => 'resolved']) }}" class="tab {{ request('severity') === 'resolved' ? 'active' : '' }}">Selesai</a>
     </div>
 
     <!-- Anomaly List -->
     <div class="mb20">
         @forelse($records as $a)
             @php
-                $colors = ['critical' => ['bg' => '#ffe8e8', 'border' => 'var(--c-danger)', 'icon' => '🚨'],
-                           'warning' => ['bg' => '#fff3e0', 'border' => 'var(--c-warn)', 'icon' => '⚠️'],
-                           'info' => ['bg' => '#e8f0fb', 'border' => '#1a4fa0', 'icon' => '🔍']];
-                $c = $colors[$a->severity] ?? $colors['info'];
                 $isResolved = $a->status === 'resolved';
+                $m = $sevMeta[$a->severity] ?? $sevMeta['info'];
+                $accent = $isResolved ? 'var(--ok)' : $m['accent'];
+                $soft = $isResolved ? 'soft-ok' : $m['soft'];
+                $icon = $isResolved ? 'shield' : ($ruleIcons[$a->rule_code] ?? $m['icon']);
             @endphp
-            <div class="card" style="margin-bottom:12px;border-left:4px solid {{ $isResolved ? 'var(--c-ok)' : $c['border'] }};{{ $isResolved ? 'opacity:0.65' : '' }}">
-                <div class="card-body" style="padding:14px 18px">
-                    <div style="display:flex;align-items:flex-start;gap:12px">
-                        <div style="width:40px;height:40px;border-radius:10px;background:{{ $isResolved ? '#e8fff6' : $c['bg'] }};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">
-                            {{ $isResolved ? '✅' : $c['icon'] }}
+            <div class="anomaly-card" style="border-left:3px solid {{ $accent }};{{ $isResolved ? 'opacity:0.65' : '' }}">
+                <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+                    <div class="icon-box {{ $soft }}"><x-icon :name="$icon" :size="20" :stroke="1.9" /></div>
+                    <div style="flex:1;min-width:200px">
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                            <span style="font-family:var(--font-display);font-size:15.5px;font-weight:600">{{ $a->title }}</span>
+                            @if($isResolved)
+                                <span class="badge-pill badge-ok">Selesai</span>
+                            @else
+                                <span class="badge-pill {{ $m['badge'] }}">{{ $m['label'] }}</span>
+                            @endif
+                            <span style="font-size:11px;color:var(--muted)">{{ $a->created_at->diffForHumans() }}</span>
                         </div>
-                        <div style="flex:1">
-                            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap">
-                                <strong style="font-size:14px">{{ $a->title }}</strong>
-                                @if($a->severity === 'critical' && !$isResolved)<span class="badge-pill badge-danger">Kritikal</span>
-                                @elseif($a->severity === 'warning' && !$isResolved)<span class="badge-pill badge-warn">Amaran</span>
-                                @elseif(!$isResolved)<span class="badge-pill badge-info">Info</span>
-                                @else<span class="badge-pill badge-ok">Selesai</span>@endif
-                                <span style="font-size:11px;color:var(--c-muted)">{{ $a->created_at->diffForHumans() }}</span>
-                            </div>
-                            <p style="font-size:13px;color:var(--c-text2);margin:0">{{ $a->description }}</p>
+                        <p class="anomaly-desc">{{ $a->description }}</p>
+                        @if($a->resolution_notes)
+                        <div style="font-size:12px;color:var(--ok);margin-top:6px;padding:6px 10px;background:#E3F2EA;border-radius:8px">
+                            {{ $a->resolution_notes }} — {{ $a->resolved_at?->format('d M Y, H:i') }}
+                        </div>
+                        @endif
+                        <div class="anomaly-meta">
                             @if($a->vehicle)
-                            <div style="font-size:11px;color:var(--c-muted);margin-top:4px">🚗 {{ $a->vehicle->plat }} — {{ $a->vehicle->model }}</div>
+                            <span class="anomaly-chip">{{ $a->vehicle->plat }}</span>
                             @endif
-                            @if($a->resolution_notes)
-                            <div style="font-size:12px;color:var(--c-ok);margin-top:6px;padding:6px 10px;background:#e8fff6;border-radius:6px">
-                                ✅ {{ $a->resolution_notes }} — {{ $a->resolved_at?->format('d M Y, H:i') }}
-                            </div>
-                            @endif
+                            <span class="anomaly-time"><x-icon name="clock" :size="13" />{{ $a->created_at->diffForHumans() }}</span>
+                        </div>
+                    </div>
+                    <div style="width:130px;flex-shrink:0">
+                        <div class="anomaly-conf-label">Keyakinan AI</div>
+                        <div style="display:flex;align-items:center;gap:8px">
+                            <div class="anomaly-conf-bar"><div class="anomaly-conf-fill" style="width:{{ $m['conf'] }}%;background:{{ $accent }}"></div></div>
+                            <span class="anomaly-conf-val" style="color:{{ $accent }}">{{ $m['conf'] }}%</span>
                         </div>
                         @if(!$isResolved)
-                        <div style="display:flex;gap:6px;flex-shrink:0">
+                        <div style="display:flex;gap:8px;margin-top:14px">
                             @if($a->status !== 'investigating')
                             <form method="POST" action="{{ route('anomalies.investigate', $a) }}">@csrf @method('PUT')
-                                <button type="submit" class="btn btn-sm btn-secondary">🔍 Siasat</button>
+                                <button type="submit" class="btn btn-sm btn-dark">Siasat</button>
                             </form>
                             @endif
-                            <button class="btn btn-sm btn-primary" onclick="openResolve({{ $a->id }}, '{{ addslashes($a->title) }}')">✅ Selesai</button>
+                            <button class="btn btn-sm btn-secondary" onclick="openResolve({{ $a->id }}, '{{ addslashes($a->title) }}')">Selesai</button>
                         </div>
                         @endif
                     </div>
                 </div>
             </div>
         @empty
-            <div style="text-align:center;padding:40px;color:var(--c-muted)">
-                <div style="font-size:48px;margin-bottom:12px;opacity:0.3">🧠</div>
+            <div style="text-align:center;padding:40px;color:var(--muted)">
+                <div style="margin-bottom:12px;opacity:0.3;display:flex;justify-content:center"><x-icon name="sparkles" :size="48" :stroke="1.3" /></div>
                 <p>Tiada anomali dikesan {{ request('severity') ? 'untuk kategori ini' : '' }}</p>
                 <form method="POST" action="{{ route('anomalies.scan') }}" style="margin-top:12px">@csrf
-                    <button type="submit" class="btn btn-primary">🔄 Imbas Sekarang</button>
+                    <button type="submit" class="btn btn-primary">Imbas Sekarang</button>
                 </form>
             </div>
         @endforelse
@@ -116,7 +131,7 @@
     <!-- Rules Config -->
     <div class="card">
         <div class="card-header">
-            <span class="card-title">⚙️ Peraturan Pengesanan Anomali</span>
+            <span class="card-title"><span class="icon-accent"><x-icon name="settings" :size="17" /></span>Peraturan Pengesanan Anomali</span>
             <span class="badge-pill badge-info">{{ count($rules) }} peraturan aktif</span>
         </div>
         <div class="card-body">
@@ -125,9 +140,9 @@
                 <tbody>
                     @foreach($rules as $r)
                     <tr>
-                        <td style="font-size:20px">{{ $r['icon'] }}</td>
-                        <td><strong>{{ $r['name'] }}</strong><div style="font-size:11px;color:var(--c-muted);font-family:monospace">{{ $r['code'] }}</div></td>
-                        <td style="font-size:12px;color:var(--c-text2)">{{ $r['description'] }}</td>
+                        <td style="color:var(--ink-2)"><x-icon :name="$ruleIcons[$r['code']] ?? 'activity'" :size="18" /></td>
+                        <td><strong>{{ $r['name'] }}</strong><div style="font-size:11px;color:var(--muted);font-family:var(--font-mono)">{{ $r['code'] }}</div></td>
+                        <td style="font-size:12px;color:var(--ink-2)">{{ $r['description'] }}</td>
                         <td>
                             @if($r['severity'] === 'critical')<span class="badge-pill badge-danger">Kritikal</span>
                             @elseif($r['severity'] === 'warning')<span class="badge-pill badge-warn">Amaran</span>
@@ -146,7 +161,7 @@
     <div class="modal-overlay" id="resolveModal">
         <div class="modal" style="max-width:420px">
             <div class="modal-header">
-                <div class="modal-title" id="resolveTitle">✅ Selesaikan Anomali</div>
+                <div class="modal-title" id="resolveTitle">Selesaikan Anomali</div>
                 <div class="modal-close" onclick="closeModal('resolveModal')">✕</div>
             </div>
             <form method="POST" id="resolveForm">
@@ -156,7 +171,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('resolveModal')">Batal</button>
-                    <button type="submit" class="btn btn-primary">✅ Tandakan Selesai</button>
+                    <button type="submit" class="btn btn-primary">Tandakan Selesai</button>
                 </div>
             </form>
         </div>
@@ -164,7 +179,7 @@
 
     <script>
     function openResolve(id, title) {
-        document.getElementById('resolveTitle').textContent = '✅ ' + title;
+        document.getElementById('resolveTitle').textContent = title;
         document.getElementById('resolveForm').action = '/anomalies/' + id + '/resolve';
         document.getElementById('resolveModal').classList.add('open');
     }

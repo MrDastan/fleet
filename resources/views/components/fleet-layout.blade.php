@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Dashboard' }} — {{ config('app.name') }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/fleet.css') }}">
 </head>
@@ -13,14 +16,19 @@
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <img src="{{ asset('images/logo.png') }}" alt="MSD" style="height:38px;width:auto;display:block;margin-bottom:4px;" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <div style="display:none;font-size:20px;font-weight:800;letter-spacing:-1px;color:#1a1a1a">MSD<span style="color:#e85d00">.</span></div>
-        <div class="sidebar-sub">Sistem Pengurusan Kenderaan</div>
+        <div class="sidebar-logo-mark">M</div>
+        <div>
+            <div class="sidebar-logo-text">MSD<span>.</span>Fleet</div>
+            <div class="sidebar-sub">Pengurusan Kenderaan</div>
+        </div>
     </div>
 
     <div class="sidebar-role">
-        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:3px">Log masuk sebagai</div>
-        <div style="color:#fff;font-size:12px;font-weight:600">{{ auth()->user()->roles->first()?->name ? ucfirst(auth()->user()->roles->first()->name) : 'User' }}</div>
+        <div class="avatar">{{ auth()->user()->avatar_initials ?? 'U' }}</div>
+        <div style="min-width:0">
+            <div class="name">{{ auth()->user()->name }}</div>
+            <div class="role-name">{{ auth()->user()->position ?? ucfirst(auth()->user()->roles->first()?->name ?? 'User') }}</div>
+        </div>
     </div>
 
     <nav id="sideNav">
@@ -35,8 +43,8 @@
             @foreach($section['items'] as $item)
                 <a href="{{ route($item['route']) }}"
                    class="nav-item {{ request()->routeIs($item['route'].'*') ? 'active' : '' }}">
-                    <span>{{ $item['icon'] }}</span>
-                    <span>{{ $item['label'] }}</span>
+                    <span class="nav-icon"><x-icon :name="$item['icon']" :size="18" /></span>
+                    <span class="nav-label">{{ $item['label'] }}</span>
                     @if(!empty($item['badge']))
                         <span class="badge {{ ($item['badgeType'] ?? '') === 'warn' ? 'warn' : '' }}">{{ $item['badge'] }}</span>
                     @endif
@@ -44,6 +52,15 @@
             @endforeach
         @endforeach
     </nav>
+
+    <div class="sidebar-foot">
+        <form method="POST" action="{{ route('logout') }}">
+            @csrf
+            <button type="submit" class="sidebar-foot-inner">
+                <x-icon name="log-out" :size="17" /><span>Log Keluar</span>
+            </button>
+        </form>
+    </div>
 </aside>
 
 <!-- SIDEBAR OVERLAY (mobile) -->
@@ -52,21 +69,24 @@
 <!-- MAIN CONTENT -->
 <div class="main">
     <header class="topbar">
-        <div style="display:flex;align-items:center;gap:10px">
+        <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
             <button class="hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
                 <span></span><span></span><span></span>
             </button>
-            <div class="topbar-title">{{ $title ?? 'Dashboard' }}</div>
+            <div class="topbar-search">
+                <x-icon name="search" :size="17" />
+                <input placeholder="Cari plat, pemandu, saman...">
+            </div>
         </div>
         <div class="topbar-right">
             <a href="{{ route('notifications.index') }}" class="topbar-notif" title="Notifikasi">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                <x-icon name="bell" :size="17" />
                 @if(auth()->user()->unreadNotifications()->count() > 0)
                     <div class="notif-dot"></div>
                 @endif
             </a>
             <a href="{{ route('reminders.index') }}" class="topbar-notif" title="Peringatan">
-                <span style="font-size:16px">🔔</span>
+                <x-icon name="calendar" :size="17" />
             </a>
             <div class="topbar-user" onclick="document.getElementById('logoutDropdown').classList.toggle('show')">
                 <div class="avatar">{{ auth()->user()->avatar_initials ?? 'U' }}</div>
@@ -74,7 +94,7 @@
                     <div class="name">{{ auth()->user()->name }}</div>
                     <div class="role-label">{{ auth()->user()->position ?? ucfirst($role) }}</div>
                 </div>
-                <span style="font-size:11px;color:#636e72;margin-left:4px">▾</span>
+                <span style="font-size:11px;color:var(--muted);margin-left:4px">▾</span>
             </div>
             <div id="logoutDropdown" class="logout-dropdown">
                 <form method="POST" action="{{ route('logout') }}">
@@ -88,14 +108,14 @@
     <div class="content">
         @if(session('success'))
             <div class="alert alert-info" style="margin-bottom:16px">
-                <span>✅</span>
+                <x-icon name="check" :size="16" />
                 <div>{{ session('success') }}</div>
             </div>
         @endif
 
         @if(session('error'))
             <div class="alert alert-danger" style="margin-bottom:16px">
-                <span>🔴</span>
+                <x-icon name="triangle-alert" :size="16" />
                 <div>{{ session('error') }}</div>
             </div>
         @endif
@@ -117,7 +137,7 @@
                 @if(!empty($item['badge']))
                     <div class="bnav-dot"></div>
                 @endif
-                <div class="icon">{{ $item['icon'] }}</div>
+                <div class="icon"><x-icon :name="$item['icon']" :size="20" /></div>
                 <div>{{ $item['label'] }}</div>
             </a>
         @endforeach
@@ -126,7 +146,7 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast">
-    <span>✅</span>
+    <x-icon name="check" :size="15" />
     <span id="toastMsg"></span>
 </div>
 

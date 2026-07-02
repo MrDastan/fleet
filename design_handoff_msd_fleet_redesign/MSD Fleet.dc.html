@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; }
+  ::placeholder { color: #A69E90; }
+  .sb-scroll::-webkit-scrollbar { width: 6px; }
+  .sb-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 3px; }
+  @keyframes msdPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.8); } }
+  @keyframes msdRise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</helmet>
+
+<div style="display:flex;min-height:100vh;background:#F6F4EF;font-family:'IBM Plex Sans',system-ui,sans-serif;color:#1B1712;-webkit-font-smoothing:antialiased">
+
+  <!-- SIDEBAR -->
+  <aside class="sb-scroll" style="width:252px;flex-shrink:0;align-self:stretch;position:sticky;top:0;height:100vh;overflow-y:auto;background:#16130E;display:flex;flex-direction:column;padding:0 0 16px">
+    <div style="padding:22px 22px 18px;display:flex;align-items:center;gap:11px">
+      <div style="width:34px;height:34px;border-radius:9px;background:#E8580C;display:flex;align-items:center;justify-content:center;color:#fff;font-family:'Space Grotesk';font-weight:700;font-size:16px;letter-spacing:-.5px">M</div>
+      <div>
+        <div style="font-family:'Space Grotesk';font-weight:700;font-size:16px;color:#fff;letter-spacing:.5px;line-height:1">MSD<span style="color:#E8580C">.</span>Fleet</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.38);letter-spacing:.3px;margin-top:3px">Pengurusan Kenderaan</div>
+      </div>
+    </div>
+
+    <div style="margin:0 16px 14px;padding:11px 13px;border-radius:11px;background:rgba(255,255,255,.05);display:flex;align-items:center;gap:10px">
+      <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#E8580C,#C0480A);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:600;font-size:12px;flex-shrink:0">AR</div>
+      <div style="min-width:0">
+        <div style="font-size:12.5px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Aisyah Rahman</div>
+        <div style="font-size:10.5px;color:rgba(255,255,255,.4)">Pentadbir Fleet</div>
+      </div>
+    </div>
+
+    <nav style="flex:1;padding:0 12px">
+      <sc-for list="{{ navRows }}" as="it" hint-placeholder-count="14">
+        <div onClick="{{ it.onClick }}" style="{{ it.rowStyle }}">
+          <span style="{{ it.iconStyle }}">{{ it.icon }}</span>
+          <span style="{{ it.labelStyle }}">{{ it.label }}</span>
+          <span style="{{ it.badgeStyle }}">{{ it.badge }}</span>
+        </div>
+      </sc-for>
+    </nav>
+
+    <div style="padding:12px 22px 0;margin-top:8px;border-top:1px solid rgba(255,255,255,.07)">
+      <div style="display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.4);font-size:12px;padding-top:12px;cursor:pointer">
+        <span>{{ ic.logOut }}</span><span>Log Keluar</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div style="flex:1;min-width:0;display:flex;flex-direction:column">
+    <!-- TOPBAR -->
+    <header style="position:sticky;top:0;z-index:40;height:62px;background:rgba(246,244,239,.85);backdrop-filter:blur(12px);border-bottom:1px solid #E7E2D9;display:flex;align-items:center;justify-content:space-between;padding:0 28px">
+      <div style="display:flex;align-items:center;gap:14px;flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:9px;width:100%;max-width:340px;background:#fff;border:1px solid #E7E2D9;border-radius:10px;padding:9px 12px;color:#938B7D">
+          {{ ic.search }}
+          <input placeholder="Cari plat, pemandu, saman..." style="border:none;outline:none;background:none;font-family:inherit;font-size:13px;color:#1B1712;width:100%">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="position:relative;width:38px;height:38px;border-radius:10px;background:#fff;border:1px solid #E7E2D9;display:flex;align-items:center;justify-content:center;color:#6B6459;cursor:pointer">
+          {{ ic.bell }}
+          <span style="position:absolute;top:8px;right:9px;width:7px;height:7px;border-radius:50%;background:#C93A32;border:2px solid #fff"></span>
+        </div>
+        <div style="width:38px;height:38px;border-radius:10px;background:#fff;border:1px solid #E7E2D9;display:flex;align-items:center;justify-content:center;color:#6B6459;cursor:pointer">{{ ic.calendar }}</div>
+      </div>
+    </header>
+
+    <main style="flex:1;padding:26px 28px 40px">
+
+      <!-- ============ DASHBOARD ============ -->
+      <sc-if value="{{ is.dashboard }}" hint-placeholder-val="{{ true }}">
+      <div data-screen-label="Dashboard" style="">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:14px;margin-bottom:22px">
+          <div>
+            <div style="font-size:12.5px;color:#938B7D;font-weight:500;margin-bottom:5px">{{ dateStr }}</div>
+            <h1 style="font-family:'Space Grotesk';font-size:27px;font-weight:600;letter-spacing:-.6px;margin:0;color:#1B1712">{{ greeting }}</h1>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button style="display:inline-flex;align-items:center;gap:7px;background:#fff;border:1px solid #E7E2D9;color:#1B1712;border-radius:10px;padding:10px 15px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">{{ ic.fileText }} Laporan</button>
+            <button style="display:inline-flex;align-items:center;gap:7px;background:#E8580C;border:none;color:#fff;border-radius:10px;padding:10px 16px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px -6px rgba(232,88,12,.6)">{{ ic.plus }} Kenderaan</button>
+          </div>
+        </div>
+
+        <!-- KPI ROW -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-bottom:18px">
+          <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+            <div onClick="{{ k.onClick }}" style="background:#fff;border:1px solid #E7E2D9;border-radius:16px;padding:17px 18px 16px;box-shadow:0 1px 2px rgba(20,15,8,.04),0 14px 30px -22px rgba(20,15,8,.28);cursor:{{ k.cursor }}">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between">
+                {{ k.icon }}
+                {{ k.spark }}
+              </div>
+              <div style="font-family:'Space Grotesk';font-size:29px;font-weight:600;letter-spacing:-.6px;margin-top:15px;line-height:1">{{ k.value }}</div>
+              <div style="font-size:12.5px;color:#6B6459;margin-top:5px">{{ k.label }}</div>
+              <div style="margin-top:11px">{{ k.sub }}</div>
+            </div>
+          </sc-for>
+        </div>
+
+        <!-- URGENT BANNER -->
+        <div style="display:flex;align-items:center;gap:13px;background:linear-gradient(100deg,#FBE6E4,#FCEFE7);border:1px solid #F3C9C4;border-radius:14px;padding:14px 18px;margin-bottom:18px">
+          <div style="width:36px;height:36px;border-radius:10px;background:#C93A32;color:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0">{{ ic.alert }}</div>
+          <div style="flex:1;font-size:13px;color:#7A2A24;line-height:1.5"><strong style="font-weight:700">Urgent:</strong> Road tax <strong>WPK 7734</strong> dan servis <strong>WXA 4821</strong> luput dalam <strong>7 hari</strong>. Sila ambil tindakan segera.</div>
+          <span style="display:inline-flex;align-items:center;gap:5px;color:#C93A32;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap">Lihat {{ ic.chevronRight }}</span>
+        </div>
+
+        <!-- MAIN SPLIT -->
+        <div style="display:flex;flex-wrap:wrap;gap:18px">
+          <!-- LEFT -->
+          <div style="flex:2 1 440px;min-width:0;display:flex;flex-direction:column;gap:18px">
+            <!-- Reminders -->
+            <div style="background:#fff;border:1px solid #E7E2D9;border-radius:16px;box-shadow:0 1px 2px rgba(20,15,8,.04)">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid #EFEBE3">
+                <div style="display:flex;align-items:center;gap:9px"><span style="color:#E8580C">{{ ic.bell }}</span><span style="font-family:'Space Grotesk';font-size:15px;font-weight:600">Peringatan Segera</span></div>
+                <span onClick="{{ goReminders }}" style="font-size:12.5px;color:#6B6459;font-weight:600;cursor:pointer">Semua</span>
+              </div>
+              <div style="padding:6px 20px 10px">
+                <sc-for list="{{ reminders }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex;align-items:center;gap:13px;padding:12px 0;border-bottom:1px solid #F2EEE6">
+                    {{ r.iconEl }}
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:13.5px;font-weight:600">{{ r.title }}</div>
+                      <div style="font-size:11.5px;color:#938B7D;margin-top:2px">{{ r.sub }}</div>
+                    </div>
+                    {{ r.badge }}
+                    {{ r.ringEl }}
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- Fuel chart -->
+            <div style="background:#fff;border:1px solid #E7E2D9;border-radius:16px;box-shadow:0 1px 2px rgba(20,15,8,.04);padding:18px 22px 20px">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px">
+                <div style="display:flex;align-items:center;gap:9px"><span style="color:#E8580C">{{ ic.fuel }}</span><span style="font-family:'Space Grotesk';font-size:15px;font-weight:600">Rekod Bahan Api</span></div>
+                <span style="font-size:11px;color:#938B7D;font-family:'IBM Plex Mono'">6 bulan terakhir</span>
+              </div>
+              <div style="display:flex;gap:34px;margin:10px 0 4px;flex-wrap:wrap">
+                <div><span style="font-family:'Space Grotesk';font-size:22px;font-weight:600">RM 9,200</span><div style="font-size:11px;color:#938B7D;margin-top:1px">Jumlah Julai</div></div>
+                <div><span style="font-family:'Space Grotesk';font-size:22px;font-weight:600">6,140<span style="font-size:14px;color:#938B7D">L</span></span><div style="font-size:11px;color:#938B7D;margin-top:1px">Jumlah liter</div></div>
+                <div><span style="font-family:'Space Grotesk';font-size:22px;font-weight:600">9.4</span><div style="font-size:11px;color:#938B7D;margin-top:1px">L/100km purata</div></div>
+              </div>
+              {{ fuelChart }}
+            </div>
+          </div>
+
+          <!-- RIGHT -->
+          <div style="flex:1 1 300px;min-width:0;display:flex;flex-direction:column;gap:18px">
+            <!-- AI teaser -->
+            <div onClick="{{ goAnomali }}" style="background:linear-gradient(155deg,#1F1B14,#16130E);border:1px solid #2B2418;border-radius:16px;padding:18px 20px;color:#fff;cursor:pointer;position:relative;overflow:hidden">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:12px">
+                <span style="width:30px;height:30px;border-radius:8px;background:rgba(232,88,12,.18);color:#F6863E;display:flex;align-items:center;justify-content:center">{{ ic.sparkles }}</span>
+                <span style="font-family:'Space Grotesk';font-size:14px;font-weight:600">Pengesanan Anomali AI</span>
+                <span style="margin-left:auto;display:flex;align-items:center;gap:5px;font-size:10.5px;color:#8CE0B4;font-weight:600"><span style="width:6px;height:6px;border-radius:50%;background:#3DD68C;animation:msdPulse 1.6s infinite"></span>Live</span>
+              </div>
+              <div style="font-family:'Space Grotesk';font-size:32px;font-weight:600;letter-spacing:-.5px">3</div>
+              <div style="font-size:12.5px;color:rgba(255,255,255,.55);margin-top:2px;margin-bottom:14px">anomali dikesan minggu ini</div>
+              <div style="background:rgba(255,255,255,.06);border-radius:11px;padding:11px 13px">
+                <div style="font-size:12.5px;font-weight:600;color:#fff">Penggunaan bahan api luar biasa</div>
+                <div style="font-size:11.5px;color:rgba(255,255,255,.5);margin-top:3px">WPK 7734 · 38% melebihi purata model</div>
+                <div style="display:flex;align-items:center;gap:8px;margin-top:9px">
+                  <div style="flex:1;height:5px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden"><div style="width:92%;height:100%;background:#E8580C;border-radius:3px"></div></div>
+                  <span style="font-family:'IBM Plex Mono';font-size:11px;color:#F6863E;font-weight:500">92%</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#F6863E;margin-top:13px">Siasat semua anomali {{ ic.arrowUpRight }}</div>
+            </div>
+
+            <!-- Status today -->
+            <div style="background:#fff;border:1px solid #E7E2D9;border-radius:16px;box-shadow:0 1px 2px rgba(20,15,8,.04)">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:1px solid #EFEBE3">
+                <div style="display:flex;align-items:center;gap:9px"><span style="color:#E8580C">{{ ic.mapPin }}</span><span style="font-family:'Space Grotesk';font-size:15px;font-weight:600">Status Hari Ini</span></div>
+                <span style="font-size:10.5px;color:#938B7D;font-family:'IBM Plex Mono'">{{ shortDate }}</span>
+              </div>
+              <div style="padding:4px 20px 12px">
+                <sc-for list="{{ statusToday }}" as="s" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #F2EEE6">
+                    {{ s.iconEl }}
+                    <div style="flex:1;min-width:0">
+                      <div style="font-size:13px;font-weight:600;font-family:'IBM Plex Mono'">{{ s.plate }}</div>
+                      <div style="font-size:11px;color:#938B7D;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.sub }}</div>
+                    </div>
+                    {{ s.badge }}
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ KENDERAAN ============ -->
+      <sc-if value="{{ is.vehicles }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Senarai Kenderaan" style="">
+        <div style="margin-bottom:20px">
+          <h1 style="font-family:'Space Grotesk';font-size:24px;font-weight:600;letter-spacing:-.5px;margin:0">Senarai Kenderaan</h1>
+          <p style="font-size:13px;color:#938B7D;margin:5px 0 0">42 kenderaan syarikat · {{ vehCount }} dipaparkan</p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px">
+          <sc-for list="{{ vfilters }}" as="f" hint-placeholder-count="4">
+            <button onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</button>
+          </sc-for>
+          <button style="margin-left:auto;display:inline-flex;align-items:center;gap:7px;background:#E8580C;border:none;color:#fff;border-radius:10px;padding:9px 15px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">{{ ic.plus }} Tambah Kenderaan</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px">
+          <sc-for list="{{ vehicles }}" as="v" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid #E7E2D9;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(20,15,8,.04),0 16px 32px -26px rgba(20,15,8,.3);cursor:pointer">
+              <div style="height:96px;background:{{ v.tileBg }};display:flex;align-items:center;justify-content:center;position:relative;color:{{ v.tileFg }}">
+                {{ v.bigIcon }}
+                <span style="position:absolute;top:11px;right:11px">{{ v.statusBadge }}</span>
+              </div>
+              <div style="padding:14px 16px 16px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between">
+                  <span style="font-family:'IBM Plex Mono';font-size:16px;font-weight:500;letter-spacing:.5px">{{ v.plate }}</span>
+                  <span style="font-size:11px;color:#938B7D;font-family:'IBM Plex Mono'">{{ v.km }} km</span>
+                </div>
+                <div style="font-size:12.5px;color:#6B6459;margin-top:3px">{{ v.model }} · {{ v.dept }}</div>
+                <div style="display:flex;gap:8px;margin-top:14px">
+                  <sc-for list="{{ v.stats }}" as="st" hint-placeholder-count="3">
+                    <div style="flex:1;background:#F6F4EF;border-radius:9px;padding:8px 4px;text-align:center">
+                      {{ st.valEl }}
+                      <div style="font-size:9.5px;color:#938B7D;margin-top:2px;letter-spacing:.3px;text-transform:uppercase">{{ st.label }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ SAMAN ============ -->
+      <sc-if value="{{ is.saman }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Pengurusan Saman" style="">
+        <div style="margin-bottom:20px">
+          <h1 style="font-family:'Space Grotesk';font-size:24px;font-weight:600;letter-spacing:-.5px;margin:0">Pengurusan Saman</h1>
+          <p style="font-size:13px;color:#938B7D;margin:5px 0 0">Saman trafik & kompaun kenderaan syarikat</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:20px">
+          <sc-for list="{{ samanStats }}" as="s" hint-placeholder-count="3">
+            <div style="background:#fff;border:1px solid #E7E2D9;border-radius:14px;padding:16px 18px">
+              <div style="font-size:12px;color:#938B7D;margin-bottom:8px">{{ s.label }}</div>
+              <div style="font-family:'Space Grotesk';font-size:24px;font-weight:600;color:{{ s.color }}">{{ s.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background:#fff;border:1px solid #E7E2D9;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(20,15,8,.04)">
+          <div style="display:grid;grid-template-columns:1.1fr 1fr 1.4fr .8fr .9fr auto;gap:14px;padding:13px 22px;background:#FAF8F4;border-bottom:1px solid #EFEBE3;font-size:10.5px;font-weight:600;letter-spacing:.6px;text-transform:uppercase;color:#938B7D">
+            <span>No. Saman / Plat</span><span>Kesalahan</span><span>Lokasi</span><span>Tarikh</span><span>Amaun</span><span>Status</span>
+          </div>
+          <sc-for list="{{ saman }}" as="s" hint-placeholder-count="5">
+            <div style="display:grid;grid-template-columns:1.1fr 1fr 1.4fr .8fr .9fr auto;gap:14px;padding:15px 22px;border-bottom:1px solid #F2EEE6;align-items:center">
+              <div>
+                <div style="font-family:'IBM Plex Mono';font-size:12px;color:#938B7D">{{ s.no }}</div>
+                <div style="font-family:'IBM Plex Mono';font-size:13.5px;font-weight:500;margin-top:2px">{{ s.plate }}</div>
+              </div>
+              <div style="font-size:12.5px;color:#3A342B">{{ s.offense }}</div>
+              <div style="font-size:12px;color:#6B6459">{{ s.location }}</div>
+              <div style="font-size:12px;color:#6B6459;font-family:'IBM Plex Mono'">{{ s.date }}</div>
+              <div style="font-family:'Space Grotesk';font-size:14px;font-weight:600">{{ s.amount }}</div>
+              <div>{{ s.badge }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ ANOMALI AI ============ -->
+      <sc-if value="{{ is.anomalies }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Pengesanan Anomali AI" style="">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+          <div style="width:40px;height:40px;border-radius:11px;background:#16130E;color:#F6863E;display:flex;align-items:center;justify-content:center">{{ ic.sparkles }}</div>
+          <div>
+            <h1 style="font-family:'Space Grotesk';font-size:24px;font-weight:600;letter-spacing:-.5px;margin:0">Pengesanan Anomali AI</h1>
+            <p style="font-size:13px;color:#938B7D;margin:4px 0 0">Model mempelajari corak biasa setiap kenderaan & memberi amaran anomali</p>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin:20px 0">
+          <sc-for list="{{ anomStats }}" as="a" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #E7E2D9;border-radius:14px;padding:16px 18px">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px;color:{{ a.color }}">{{ a.icon }}<span style="font-size:11.5px;color:#938B7D;font-weight:500">{{ a.label }}</span></div>
+              <div style="font-family:'Space Grotesk';font-size:23px;font-weight:600">{{ a.value }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <sc-for list="{{ anomalies }}" as="a" hint-placeholder-count="4">
+            <div style="background:#fff;border:1px solid #E7E2D9;border-left:3px solid {{ a.accent }};border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(20,15,8,.04)">
+              <div style="display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap">
+                <div style="width:42px;height:42px;border-radius:11px;background:{{ a.iconBg }};color:{{ a.accent }};display:flex;align-items:center;justify-content:center;flex-shrink:0">{{ a.icon }}</div>
+                <div style="flex:1;min-width:200px">
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <span style="font-family:'Space Grotesk';font-size:15.5px;font-weight:600">{{ a.title }}</span>
+                    {{ a.sevBadge }}
+                  </div>
+                  <div style="font-size:13px;color:#5A544B;margin-top:5px;line-height:1.5">{{ a.desc }}</div>
+                  <div style="display:flex;align-items:center;gap:16px;margin-top:11px;flex-wrap:wrap">
+                    <span style="display:inline-flex;align-items:center;gap:6px;font-family:'IBM Plex Mono';font-size:12px;font-weight:500;background:#F6F4EF;padding:4px 9px;border-radius:7px">{{ a.plate }}</span>
+                    <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#938B7D">{{ ic.clock }}{{ a.time }}</span>
+                  </div>
+                </div>
+                <div style="width:130px;flex-shrink:0">
+                  <div style="font-size:10.5px;color:#938B7D;margin-bottom:5px">Keyakinan AI</div>
+                  <div style="display:flex;align-items:center;gap:8px">
+                    <div style="flex:1;height:6px;border-radius:3px;background:#EFEBE3;overflow:hidden"><div style="width:{{ a.conf }};height:100%;background:{{ a.accent }};border-radius:3px"></div></div>
+                    <span style="font-family:'IBM Plex Mono';font-size:12.5px;font-weight:500;color:{{ a.accent }}">{{ a.conf }}</span>
+                  </div>
+                  <div style="display:flex;gap:8px;margin-top:14px">
+                    <button style="flex:1;background:#16130E;color:#fff;border:none;border-radius:8px;padding:8px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer">Siasat</button>
+                    <button style="background:#F6F4EF;color:#6B6459;border:1px solid #E7E2D9;border-radius:8px;padding:8px 10px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer">Abai</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      </sc-if>
+
+      <!-- ============ GENERIC PLACEHOLDER ============ -->
+      <sc-if value="{{ is.other }}" hint-placeholder-val="{{ false }}">
+      <div data-screen-label="Modul" style="display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:52vh">
+        <div style="width:58px;height:58px;border-radius:16px;background:#fff;border:1px solid #E7E2D9;display:flex;align-items:center;justify-content:center;color:#E8580C;margin-bottom:16px">{{ otherIcon }}</div>
+        <h2 style="font-family:'Space Grotesk';font-size:20px;font-weight:600;margin:0 0 6px">{{ otherLabel }}</h2>
+        <p style="font-size:13px;color:#938B7D;max-width:360px;margin:0 0 18px;line-height:1.6">Modul ini menggunakan sistem reka bentuk yang sama. Terokai Dashboard, Kenderaan, Saman & Anomali AI yang telah direka semula.</p>
+        <button onClick="{{ goDash }}" style="background:#16130E;color:#fff;border:none;border-radius:10px;padding:10px 18px;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer">← Kembali ke Dashboard</button>
+      </div>
+      </sc-if>
+
+    </main>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { view: 'dashboard', vfilter: 'all' };
+
+  ICONS = {
+    gauge: '<path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/>',
+    bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+    car: '<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+    truck: '<path d="M14 18V6a1 1 0 0 0-1-1H3a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h1"/><path d="M14 9h4l4 4v4a1 1 0 0 1-1 1h-1"/><circle cx="7" cy="18" r="2"/><path d="M9 18h6"/><circle cx="17" cy="18" r="2"/>',
+    wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+    fileText: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M8 13h8"/><path d="M8 17h8"/><path d="M8 9h2"/>',
+    fuel: '<line x1="3" x2="15" y1="22" y2="22"/><line x1="4" x2="14" y1="9" y2="9"/><path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/><path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2 2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/>',
+    route: '<circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"/><circle cx="18" cy="5" r="3"/>',
+    alert: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+    clipboardCheck: '<rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/>',
+    sparkles: '<path d="M12 3l1.9 5.6L20 10l-6.1 1.4L12 17l-1.9-5.6L4 10l6.1-1.4z"/><path d="M19 3v4"/><path d="M21 5h-4"/>',
+    barChart: '<line x1="12" x2="12" y1="20" y2="10"/><line x1="18" x2="18" y1="20" y2="4"/><line x1="6" x2="6" y1="20" y2="16"/>',
+    qr: '<rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/>',
+    users: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+    settings: '<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>',
+    search: '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+    plus: '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    chevronRight: '<path d="m9 18 6-6-6-6"/>',
+    arrowUpRight: '<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+    mapPin: '<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+    clock: '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+    shield: '<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>',
+    calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+    logOut: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>',
+    trendingUp: '<path d="M16 7h6v6"/><path d="m22 7-8.5 8.5-5-5L2 17"/>',
+    trendingDown: '<path d="M16 17h6v-6"/><path d="m22 17-8.5-8.5-5 5L2 7"/>',
+    receipt: '<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>',
+    activity: '<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>',
+    gauge2: '<path d="M12 14 4-4"/>',
+    eye: '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>'
+  };
+
+  icon(name, size, sw) {
+    return React.createElement('svg', {
+      key: name, width: size || 18, height: size || 18, viewBox: '0 0 24 24', fill: 'none',
+      stroke: 'currentColor', strokeWidth: sw || 1.8, strokeLinecap: 'round', strokeLinejoin: 'round',
+      style: { display: 'block', flexShrink: 0 },
+      dangerouslySetInnerHTML: { __html: this.ICONS[name] || '' }
+    });
+  }
+
+  C = { A:'#E8580C', ink:'#1B1712', t2:'#6B6459', mut:'#938B7D', brd:'#E7E2D9' };
+  KIND = {
+    ok:['#E3F2EA','#137049'], warn:['#FBEFD6','#986410'], danger:['#FBE6E4','#C0362E'],
+    info:['#E7EDFB','#2C5AC0'], neutral:['#EEEBE4','#6B6459'], accent:['#FCEBE0','#C0480A'], purple:['#EEEAF7','#5B3FA0']
+  };
+
+  pill(text, kind) {
+    const [bg, fg] = this.KIND[kind] || this.KIND.neutral;
+    return React.createElement('span', { style: {
+      display:'inline-flex', alignItems:'center', gap:5, padding:'3px 10px', borderRadius:999,
+      fontSize:11, fontWeight:600, letterSpacing:'.2px', background:bg, color:fg, whiteSpace:'nowrap'
+    }}, text);
+  }
+
+  softIcon(name, kind, sz) {
+    const [bg, fg] = this.KIND[kind] || this.KIND.neutral;
+    return React.createElement('div', { style: {
+      width: sz||36, height: sz||36, borderRadius:10, background:bg, color:fg,
+      display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0
+    }}, this.icon(name, (sz||36)*0.52, 1.9));
+  }
+
+  sub(text, color) {
+    return React.createElement('div', { style:{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, color }},
+      React.createElement('span', { style:{ width:6, height:6, borderRadius:99, background:color }}), text);
+  }
+
+  spark(pts, color) {
+    const w=64, h=26, max=Math.max(...pts), min=Math.min(...pts), rng=(max-min)||1;
+    const step = w/(pts.length-1);
+    const d = pts.map((p,i)=> `${i===0?'M':'L'}${(i*step).toFixed(1)} ${(h-2-((p-min)/rng)*(h-6)).toFixed(1)}`).join(' ');
+    return React.createElement('svg', { width:w, height:h, viewBox:`0 0 ${w} ${h}`, fill:'none', style:{overflow:'visible'} },
+      React.createElement('path', { d, stroke:color, strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round' }),
+      React.createElement('circle', { cx:w, cy:(h-2-((pts[pts.length-1]-min)/rng)*(h-6)), r:2.6, fill:color })
+    );
+  }
+
+  ring(days, color) {
+    const r=17, c=2*Math.PI*r, pct=Math.max(0.06, Math.min(1,(60-days)/60)), off=c*(1-pct);
+    return React.createElement('div', { style:{ position:'relative', width:44, height:44, flexShrink:0 }},
+      React.createElement('svg', { width:44, height:44, viewBox:'0 0 44 44', style:{ transform:'rotate(-90deg)' }},
+        React.createElement('circle', { cx:22, cy:22, r, fill:'none', stroke:'#EFEBE3', strokeWidth:3.5 }),
+        React.createElement('circle', { cx:22, cy:22, r, fill:'none', stroke:color, strokeWidth:3.5, strokeLinecap:'round', strokeDasharray:c, strokeDashoffset:off })
+      ),
+      React.createElement('div', { style:{ position:'absolute', inset:0, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', lineHeight:1 }},
+        React.createElement('span', { style:{ fontFamily:'"Space Grotesk"', fontSize:14, fontWeight:600, color }}, days),
+        React.createElement('span', { style:{ fontSize:7.5, color:'#938B7D', marginTop:1 }}, 'hari')
+      )
+    );
+  }
+
+  fuelChartEl() {
+    const data = [
+      {m:'Feb', v:8.1}, {m:'Mac', v:9.4}, {m:'Apr', v:8.8}, {m:'Mei', v:10.2}, {m:'Jun', v:11.1}, {m:'Jul', v:9.2, cur:true}
+    ];
+    const max = Math.max(...data.map(d=>d.v));
+    return React.createElement('div', { style:{ display:'flex', alignItems:'flex-end', gap:14, height:130, marginTop:14 }},
+      data.map((d,i)=> React.createElement('div', { key:i, style:{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:7, height:'100%', justifyContent:'flex-end' }},
+        React.createElement('div', { style:{ fontFamily:'"IBM Plex Mono"', fontSize:10, color:d.cur?this.C.A:'#B4AC9E', fontWeight:500 }}, d.v.toFixed(1)+'k'),
+        React.createElement('div', { style:{ width:'100%', maxWidth:32, height:Math.round((d.v/max)*88)+6, borderRadius:'7px 7px 3px 3px', background:d.cur?'linear-gradient(180deg,#F6863E,#E8580C)':'#ECE7DE' }}),
+        React.createElement('div', { style:{ fontSize:11, color:d.cur?this.C.ink:'#938B7D', fontWeight:d.cur?600:500 }}, d.m)
+      ))
+    );
+  }
+
+  go(id){ return () => this.setState({ view:id }); }
+
+  renderVals() {
+    const v = this.state.view;
+    const built = ['dashboard','vehicles','saman','anomalies'];
+    const mk = (id, icon, label, badge, btype) => {
+      const active = v === id;
+      return {
+        id, label, badge, btype, icon: this.icon(icon, 18, 1.8),
+        onClick: this.go(id),
+        rowStyle: {
+          display:'flex', alignItems:'center', gap:11, padding:'9px 11px', margin:'2px 0', borderRadius:10, cursor:'pointer',
+          color: active ? '#fff' : 'rgba(255,255,255,.56)',
+          background: active ? 'rgba(232,88,12,.16)' : 'transparent',
+          boxShadow: active ? 'inset 2px 0 0 #E8580C' : 'none'
+        }
+      };
+    };
+
+    const nav = [
+      { sec:'Utama', items:[ mk('dashboard','gauge','Dashboard'), mk('reminders','bell','Peringatan','5','danger') ] },
+      { sec:'Pengurusan', items:[
+        mk('vehicles','car','Senarai Kenderaan'), mk('approvals','clipboardCheck','Permohonan','4','danger'),
+        mk('services','wrench','Servis'), mk('roadtax','fileText','Road Tax & Insuran','3','warn'),
+        mk('fuel','fuel','Bahan Api'), mk('saman','alert','Saman','4','danger'), mk('movements','route','Log Pergerakan') ] },
+      { sec:'Analisis', items:[ mk('reports','barChart','Laporan'), mk('anomalies','sparkles','Anomali AI','3','danger'), mk('qr','qr','QR Kenderaan') ] },
+      { sec:'Sistem', items:[ mk('users','users','Pengguna'), mk('settings','settings','Tetapan') ] }
+    ];
+
+    const hide = { display:'none' };
+    const navRows = [];
+    nav.forEach((grp) => {
+      navRows.push({
+        label: grp.sec, icon: null, badge: '',
+        onClick: undefined,
+        rowStyle: { display:'block', padding:'16px 10px 5px' },
+        iconStyle: hide, badgeStyle: hide,
+        labelStyle: { fontSize:9.5, fontWeight:600, letterSpacing:'1.4px', textTransform:'uppercase', color:'rgba(255,255,255,.28)' }
+      });
+      grp.items.forEach((it) => {
+        navRows.push({
+          label: it.label, icon: it.icon, badge: it.badge || '',
+          onClick: it.onClick, rowStyle: it.rowStyle,
+          iconStyle: { display:'flex', alignItems:'center', justifyContent:'center', width:20 },
+          labelStyle: { flex:1, fontSize:13, fontWeight:500 },
+          badgeStyle: it.badge ? {
+            fontFamily:'"IBM Plex Mono"', fontSize:10, fontWeight:600, minWidth:18, textAlign:'center', padding:'1px 6px', borderRadius:9,
+            background: it.btype==='warn' ? 'rgba(224,162,59,.9)' : '#D8443C', color:'#fff'
+          } : hide
+        });
+      });
+    });
+
+    const ic = {};
+    ['search','bell','calendar','logOut','plus','fileText','chevronRight','arrowUpRight','fuel','mapPin','sparkles','clock','alert'].forEach(n=> ic[n]=this.icon(n, n==='chevronRight'?15:(n==='arrowUpRight'?14:17), 1.8));
+
+    // KPIs
+    const kpis = [
+      { value:'42', label:'Jumlah Kenderaan', icon:this.softIcon('car','accent',38), spark:this.spark([36,38,37,40,41,42],'#137049'), sub:this.sub('+2 bulan ini','#137049'), cursor:'default' },
+      { value:'7', label:'Perlu Perhatian', icon:this.softIcon('alert','warn',38), spark:this.spark([4,5,4,6,7,7],'#C0362E'), sub:this.sub('3 kritikal','#C0362E'), cursor:'default' },
+      { value:'3', label:'Dalam Servis', icon:this.softIcon('wrench','info',38), spark:this.spark([2,1,2,3,2,3],'#2C5AC0'), sub:this.sub('WXA 4821 & 2 lagi','#986410'), cursor:'default' },
+      { value:'RM 3,240', label:'Saman Belum Bayar', icon:this.softIcon('receipt','danger',38), spark:this.spark([1,2,2,3,3,4],'#C0362E'), sub:this.sub('4 saman tertunggak','#C0362E'), cursor:'pointer', onClick:this.go('saman') }
+    ];
+
+    // Reminders
+    const remRaw = [
+      { icon:'fileText', title:'Road Tax — WPK 7734', sub:'Proton X70 · Operasi', days:5, sev:'danger' },
+      { icon:'wrench', title:'Servis — WXA 4821', sub:'Isuzu D-Max · Kejuruteraan', days:6, sev:'danger' },
+      { icon:'shield', title:'Insuran — VBM 923', sub:'Toyota Hilux · Logistik', days:11, sev:'warn' },
+      { icon:'fileText', title:'Road Tax — JHK 118', sub:'Perodua Bezza · Pentadbiran', days:23, sev:'warn' }
+    ];
+    const sevColor = { danger:'#C93A32', warn:'#C0851A', ok:'#137049' };
+    const reminders = remRaw.map(r=>({
+      title:r.title, sub:r.sub,
+      iconEl:this.softIcon(r.icon, r.sev==='danger'?'danger':(r.sev==='warn'?'warn':'ok'), 36),
+      badge:null,
+      ringEl:this.ring(r.days, sevColor[r.sev])
+    }));
+
+    // Status today
+    const stRaw = [
+      { plate:'WXA 4821', sub:'Isuzu D-Max · Bengkel Setapak', badge:['Dalam Servis','warn'], icon:'wrench', kind:'warn' },
+      { plate:'VBM 923', sub:'Pemandu: Hafiz → Shah Alam', badge:['Dalam Perjalanan','ok'], icon:'route', kind:'ok' },
+      { plate:'JHK 118', sub:'Pemandu: Siti → Putrajaya', badge:['Dalam Perjalanan','ok'], icon:'route', kind:'ok' },
+      { plate:'WPK 7734', sub:'Proton X70 · Operasi', badge:['Di Pejabat','neutral'], icon:'car', kind:'neutral' },
+      { plate:'BMT 5521', sub:'Honda City · Sumber Manusia', badge:['Di Pejabat','neutral'], icon:'car', kind:'neutral' }
+    ];
+    const statusToday = stRaw.map(s=>({
+      plate:s.plate, sub:s.sub, iconEl:this.softIcon(s.icon, s.kind, 34), badge:this.pill(s.badge[0], s.badge[1])
+    }));
+
+    // Vehicles
+    const vehRaw = [
+      { plate:'WXA 4821', model:'Isuzu D-Max 2022', dept:'Kejuruteraan', km:'84,210', status:'servis', rt:6, ins:88, srv:0, type:'truck' },
+      { plate:'WPK 7734', model:'Proton X70 2023', dept:'Operasi', km:'41,880', status:'aktif', rt:5, ins:64, srv:120, type:'car' },
+      { plate:'VBM 923', model:'Toyota Hilux 2021', dept:'Logistik', km:'112,540', status:'aktif', rt:47, ins:11, srv:32, type:'truck' },
+      { plate:'JHK 118', model:'Perodua Bezza 2020', dept:'Pentadbiran', km:'96,120', status:'aktif', rt:23, ins:120, srv:18, type:'car' },
+      { plate:'BMT 5521', model:'Honda City 2022', dept:'Sumber Manusia', km:'58,300', status:'aktif', rt:210, ins:41, srv:64, type:'car' },
+      { plate:'WQL 2093', model:'Toyota Innova 2019', dept:'Operasi', km:'134,900', status:'rosak', rt:88, ins:150, srv:0, type:'car' },
+      { plate:'VCT 7781', model:'Nissan Navara 2021', dept:'Logistik', km:'78,450', status:'aktif', rt:132, ins:96, srv:41, type:'truck' },
+      { plate:'WYA 3360', model:'Perodua Ativa 2023', dept:'Pentadbiran', km:'22,140', status:'aktif', rt:280, ins:190, srv:88, type:'car' },
+      { plate:'JPB 442', model:'Mitsubishi Triton 2020', dept:'Kejuruteraan', km:'101,220', status:'aktif', rt:60, ins:74, srv:22, type:'truck' }
+    ];
+    const dc = (days) => days<=7 ? '#C93A32' : (days<=30 ? '#C0851A' : '#137049');
+    const statVal = (txt, color) => React.createElement('div', { style:{ fontFamily:'"Space Grotesk"', fontSize:14, fontWeight:600, color }}, txt);
+    const filtered = vehRaw.filter(x=> this.state.vfilter==='all' ? true : x.status===this.state.vfilter);
+    const tileThemes = { car:['#FCEBE0','#C0480A'], truck:['#EDEAE3','#5A544B'] };
+    const vehicles = filtered.map(x=>{
+      const [tbg,tfg] = tileThemes[x.type];
+      const sb = x.status==='servis' ? this.pill('Servis','warn') : (x.status==='rosak' ? this.pill('Rosak','danger') : this.pill('Aktif','ok'));
+      return {
+        plate:x.plate, model:x.model, dept:x.dept, km:x.km,
+        tileBg:`linear-gradient(135deg,${tbg},${tbg})`, tileFg:tfg,
+        bigIcon:this.icon(x.type, 42, 1.5), statusBadge:sb,
+        stats:[
+          { valEl:statVal(x.rt+'h', dc(x.rt)), label:'Road Tax' },
+          { valEl:statVal(x.ins+'h', dc(x.ins)), label:'Insuran' },
+          { valEl:statVal(x.srv>0?x.srv+'h':'—', x.srv>0?dc(x.srv):'#938B7D'), label:'Servis' }
+        ]
+      };
+    });
+    const vfilterDefs = [['all','Semua'],['aktif','Aktif'],['servis','Dalam Servis'],['rosak','Rosak']];
+    const vfilters = vfilterDefs.map(([id,label])=>{
+      const on = this.state.vfilter===id;
+      return { label, onClick:()=>this.setState({vfilter:id}), style:{
+        background:on?'#16130E':'#fff', color:on?'#fff':'#6B6459', border:'1px solid '+(on?'#16130E':'#E7E2D9'),
+        borderRadius:10, padding:'8px 14px', fontFamily:'"IBM Plex Sans"', fontSize:12.5, fontWeight:600, cursor:'pointer'
+      }};
+    });
+
+    // Saman
+    const samanStats = [
+      { label:'Belum Bayar', value:'RM 3,040', color:'#C93A32' },
+      { label:'Jumlah Saman', value:'RM 3,340', color:'#1B1712' },
+      { label:'Dirayu', value:'1', color:'#C0851A' }
+    ];
+    const samanRaw = [
+      { no:'SMN-2026-0412', plate:'WPK 7734', offense:'Memandu melebihi had laju', location:'Lebuhraya PLUS KM32', date:'12 Jun', amount:'RM 300', status:['Belum Bayar','danger'] },
+      { no:'SMN-2026-0398', plate:'VBM 923', offense:'Letak kenderaan di kawasan larangan', location:'Jln Tun Razak, KL', date:'03 Jun', amount:'RM 150', status:['Belum Bayar','danger'] },
+      { no:'SMN-2026-0377', plate:'JHK 118', offense:'Tidak mematuhi lampu isyarat', location:'Persimpangan KLCC', date:'28 Mei', amount:'RM 300', status:['Dirayu','warn'] },
+      { no:'SMN-2026-0355', plate:'WXA 4821', offense:'Beban berlebihan', location:'Timbang Gombak', date:'19 Mei', amount:'RM 2,490', status:['Belum Bayar','danger'] },
+      { no:'SMN-2026-0341', plate:'BMT 5521', offense:'Parkir tanpa tiket', location:'Mid Valley Megamall', date:'02 Mei', amount:'RM 100', status:['Dibayar','ok'] }
+    ];
+    const saman = samanRaw.map(s=>({ no:s.no, plate:s.plate, offense:s.offense, location:s.location, date:s.date, amount:s.amount, badge:this.pill(s.status[0], s.status[1]) }));
+
+    // Anomalies
+    const anomStats = [
+      { label:'Anomali aktif', value:'3', color:'#C93A32', icon:this.icon('alert',18,1.9) },
+      { label:'Disiasat', value:'2', color:'#2C5AC0', icon:this.icon('eye',18,1.9) },
+      { label:'Purata keyakinan', value:'80%', color:'#C0480A', icon:this.icon('activity',18,1.9) },
+      { label:'Kenderaan dipantau', value:'42', color:'#137049', icon:this.icon('shield',18,1.9) }
+    ];
+    const anomRaw = [
+      { title:'Penggunaan bahan api luar biasa', plate:'WPK 7734', icon:'fuel', desc:'Penggunaan 38% lebih tinggi daripada purata Proton X70 dalam fleet — corak ini bermula 2 minggu lalu tanpa perubahan jarak perjalanan.', conf:92, time:'2 jam lalu', sev:'high' },
+      { title:'Jarak tidak sepadan dengan log', plate:'VBM 923', icon:'route', desc:'Odometer bertambah 140km tanpa rekod log pergerakan yang sepadan pada hujung minggu.', conf:87, time:'Semalam', sev:'high' },
+      { title:'Isi minyak luar waktu pejabat', plate:'JHK 118', icon:'clock', desc:'Transaksi bahan api direkod pada 11:47 malam — di luar corak biasa kenderaan ini (08:00–18:00).', conf:74, time:'2 hari lalu', sev:'medium' },
+      { title:'Servis kerap luar jadual', plate:'WXA 4821', icon:'wrench', desc:'3 tuntutan servis dalam 60 hari, melebihi purata kekerapan untuk kenderaan seusia.', conf:68, time:'4 hari lalu', sev:'medium' }
+    ];
+    const sevMap = { high:{accent:'#C93A32', bg:'#FBE6E4', badge:this.pill('Keutamaan Tinggi','danger')}, medium:{accent:'#C0851A', bg:'#FBEFD6', badge:this.pill('Sederhana','warn')} };
+    const anomalies = anomRaw.map(a=>{
+      const m = sevMap[a.sev];
+      return { title:a.title, plate:a.plate, desc:a.desc, time:a.time, conf:a.conf+'%',
+        accent:m.accent, iconBg:m.bg, sevBadge:m.badge, icon:this.icon(a.icon, 20, 1.9) };
+    });
+
+    // Placeholder
+    const otherLabels = { reminders:'Peringatan', approvals:'Permohonan Kenderaan', services:'Servis & Penyelenggaraan', roadtax:'Road Tax & Insuran', fuel:'Bahan Api', movements:'Log Pergerakan', reports:'Laporan', qr:'QR Kenderaan', users:'Pengguna', settings:'Tetapan' };
+    const otherIcons = { reminders:'bell', approvals:'clipboardCheck', services:'wrench', roadtax:'fileText', fuel:'fuel', movements:'route', reports:'barChart', qr:'qr', users:'users', settings:'settings' };
+
+    const now = new Date(2026, 6, 1);
+    const days = ['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
+    const months = ['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
+    const dateStr = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    const shortDate = `${String(now.getDate()).padStart(2,'0')} ${['Jan','Feb','Mac','Apr','Mei','Jun','Jul','Ogos','Sep','Okt','Nov','Dis'][now.getMonth()]}`;
+
+    return {
+      view: v, nav, navRows, ic,
+      is: { dashboard:v==='dashboard', vehicles:v==='vehicles', saman:v==='saman', anomalies:v==='anomalies', other: !built.includes(v) },
+      kpis, reminders, statusToday, fuelChart:this.fuelChartEl(),
+      vehicles, vehCount:filtered.length, vfilters,
+      saman, samanStats, anomalies, anomStats,
+      greeting:'Selamat pagi, Aisyah', dateStr, shortDate,
+      goDash:this.go('dashboard'), goAnomali:this.go('anomalies'), goReminders:this.go('reminders'),
+      otherLabel: otherLabels[v] || 'Modul', otherIcon: this.icon(otherIcons[v] || 'settings', 28, 1.7)
+    };
+  }
+}
+</script>
+</body>
+</html>
