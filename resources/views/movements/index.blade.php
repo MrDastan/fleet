@@ -1,22 +1,22 @@
 <x-fleet-layout title="Log Pergerakan">
     <div class="page-header">
-        <h2>Log Pergerakan & Check-in/out</h2>
+        <h1>Log Pergerakan & Check-in/out</h1>
         <p>Log keluar masuk kenderaan di stor / parkir syarikat</p>
     </div>
 
     @if($outCount > 0)
     <div class="alert alert-info">
-        <span>🚗</span>
+        <x-icon name="car" :size="16" />
         <div><strong>{{ $outCount }} kenderaan</strong> sedang di luar. Pastikan semua kenderaan di-check-in sebelum tamat hari.</div>
     </div>
     @endif
 
     <div class="search-bar">
         <form method="GET" action="{{ route('movements.index') }}" style="display:flex;gap:10px;flex:1;flex-wrap:wrap">
-            <input type="text" name="search" class="form-control search-input" placeholder="🔍  Cari nama / plat / tujuan..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control search-input" placeholder="Cari nama / plat / tujuan..." value="{{ request('search') }}">
             <input type="date" name="date" class="form-control" style="width:160px" value="{{ request('date', date('Y-m-d')) }}" onchange="this.form.submit()">
         </form>
-        <button class="btn btn-primary" onclick="document.getElementById('checkoutModal').classList.add('open')">+ Log Keluar</button>
+        <button class="btn btn-primary" onclick="document.getElementById('checkoutModal').classList.add('open')"><x-icon name="plus" :size="16" /> Log Keluar</button>
     </div>
 
     <div class="card">
@@ -74,7 +74,7 @@
     <div class="modal-overlay" id="checkoutModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">📋 Log Keluar Kenderaan</div>
+                <div class="modal-title"><x-icon name="clipboard-check" :size="18" /> Log Keluar Kenderaan</div>
                 <div class="modal-close" onclick="closeModal('checkoutModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('movements.store') }}">
@@ -121,7 +121,7 @@
     <div class="modal-overlay" id="checkinModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="checkinTitle">📋 Log Masuk Kenderaan</div>
+                <div class="modal-title" id="checkinTitle"><x-icon name="clipboard-check" :size="18" /> Log Masuk Kenderaan</div>
                 <div class="modal-close" onclick="closeModal('checkinModal')">✕</div>
             </div>
             <form method="POST" id="checkinForm">
@@ -148,7 +148,7 @@
 
     <script>
     function openCheckin(id, plat, kmOut) {
-        document.getElementById('checkinTitle').textContent = '📋 Log Masuk — ' + plat;
+        document.getElementById('checkinTitle').textContent = 'Log Masuk — ' + plat;
         document.getElementById('checkinForm').action = '/movements/' + id + '/checkin';
         document.getElementById('checkinKm').value = '';
         document.getElementById('checkinKm').placeholder = kmOut ? 'Min: ' + kmOut.toLocaleString() : '0';

@@ -1,6 +1,6 @@
 <x-fleet-layout title="Tetapan Sistem">
     <div class="page-header">
-        <h2>Tetapan Sistem</h2>
+        <h1>Tetapan Sistem</h1>
         <p>Konfigurasi sistem pengurusan fleet</p>
     </div>
 
@@ -8,7 +8,7 @@
         @csrf
         <div class="grid-2">
             <div class="card mb20">
-                <div class="card-header"><span class="card-title">🏢 Maklumat Syarikat</span></div>
+                <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="file-text" :size="17" /></span>Maklumat Syarikat</span></div>
                 <div class="card-body">
                     <div class="form-group"><label class="form-label">Nama Syarikat</label>
                         <input name="company_name" class="form-control" value="{{ $settings['company_name'] ?? 'MSD Sdn Bhd' }}">
@@ -26,7 +26,7 @@
             </div>
 
             <div class="card mb20">
-                <div class="card-header"><span class="card-title">🔔 Tetapan Notifikasi</span></div>
+                <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="bell" :size="17" /></span>Tetapan Notifikasi</span></div>
                 <div class="card-body">
                     <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
                         <label style="display:flex;align-items:center;gap:10px;cursor:pointer">
@@ -51,13 +51,13 @@
         </div>
 
         <div style="display:flex;justify-content:flex-end;margin-bottom:20px">
-            <button type="submit" class="btn btn-primary">💾 Simpan Semua Tetapan</button>
+            <button type="submit" class="btn btn-primary"><x-icon name="check" :size="16" /> Simpan Semua Tetapan</button>
         </div>
     </form>
 
     <!-- Reminder Config (read-only display) -->
     <div class="card">
-        <div class="card-header"><span class="card-title">⚙️ Tetapan Peringatan Automatik</span></div>
+        <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="settings" :size="17" /></span>Tetapan Peringatan Automatik</span></div>
         <div class="card-body">
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
                 @foreach([

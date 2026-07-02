@@ -1,14 +1,14 @@
 <x-fleet-layout title="Pengurusan Pengguna">
     <div class="page-header">
-        <h2>Pengurusan Pengguna</h2>
+        <h1>Pengurusan Pengguna</h1>
         <p>Urus hak akses pengguna sistem</p>
     </div>
 
     <div class="search-bar">
         <form method="GET" action="{{ route('users.index') }}" style="display:flex;gap:10px;flex:1">
-            <input type="text" name="search" class="form-control search-input" placeholder="🔍  Cari nama, emel, no. pekerja..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control search-input" placeholder="Cari nama, emel, no. pekerja..." value="{{ request('search') }}">
         </form>
-        <button class="btn btn-primary" onclick="document.getElementById('addUserModal').classList.add('open')">+ Tambah Pengguna</button>
+        <button class="btn btn-primary" onclick="document.getElementById('addUserModal').classList.add('open')"><x-icon name="plus" :size="16" /> Tambah Pengguna</button>
     </div>
 
     <div class="card">
@@ -38,7 +38,7 @@
                         @else<span class="badge-pill badge-danger">Tidak Aktif</span>@endif
                     </td>
                     <td style="white-space:nowrap">
-                        <button class="btn btn-sm btn-secondary" onclick="openEditUser({{ $u->id }})">Edit</button>
+                        <button class="btn btn-sm btn-secondary" onclick="openEditUser({{ $u->id }})"><x-icon name="pencil" :size="13" /> Edit</button>
                         @if($u->id !== auth()->id())
                         <form method="POST" action="{{ route('users.destroy', $u) }}" style="display:inline" onsubmit="return confirm('Padam pengguna {{ $u->name }}?')">
                             @csrf @method('DELETE')
@@ -56,7 +56,7 @@
     <div class="modal-overlay" id="addUserModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">👤 Tambah Pengguna Baharu</div>
+                <div class="modal-title"><x-icon name="users" :size="18" /> Tambah Pengguna Baharu</div>
                 <div class="modal-close" onclick="closeModal('addUserModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('users.store') }}">
@@ -98,7 +98,7 @@
     <div class="modal-overlay" id="editUserModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="editUserTitle">✏️ Kemaskini Pengguna</div>
+                <div class="modal-title" id="editUserTitle"><x-icon name="pencil" :size="17" /> Kemaskini Pengguna</div>
                 <div class="modal-close" onclick="closeModal('editUserModal')">✕</div>
             </div>
             <form method="POST" id="editUserForm">
@@ -151,7 +151,7 @@
     function openEditUser(id) {
         const u = usersData[id];
         if (!u) return;
-        document.getElementById('editUserTitle').textContent = '✏️ ' + u.name;
+        document.getElementById('editUserTitle').textContent = u.name;
         document.getElementById('editUserForm').action = '/users/' + id;
         document.getElementById('eu_name').value = u.name || '';
         document.getElementById('eu_email').value = u.email || '';

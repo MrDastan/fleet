@@ -1,27 +1,27 @@
 <x-fleet-layout title="Rekod Bahan Api">
     <div class="page-header">
-        <h2>Rekod Bahan Api</h2>
+        <h1>Rekod Bahan Api</h1>
         <p>Log pengisian bahan api dan analisis penggunaan</p>
     </div>
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon" style="background:#fff8e0">⛽</div>
+            <div class="stat-icon soft-warn"><x-icon name="fuel" :size="18" /></div>
             <div class="stat-val">{{ number_format($totalLiters, 0) }}L</div>
             <div class="stat-label">Jumlah {{ now()->translatedFormat('M Y') }}</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background:#e8f0fb">💳</div>
+            <div class="stat-icon soft-info"><x-icon name="receipt" :size="18" /></div>
             <div class="stat-val">RM {{ number_format($totalCost, 0) }}</div>
             <div class="stat-label">Kos Bahan Api</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background:#e8fff6">📏</div>
+            <div class="stat-icon soft-ok"><x-icon name="activity" :size="18" /></div>
             <div class="stat-val">{{ $avgConsumption ? number_format($avgConsumption, 1) : '—' }}</div>
             <div class="stat-label">L/100km Purata</div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon" style="background:#fce8e8">🚨</div>
+            <div class="stat-icon soft-danger"><x-icon name="triangle-alert" :size="18" /></div>
             <div class="stat-val">{{ $highUsage }}</div>
             <div class="stat-label">Penggunaan Tinggi</div>
             @if($highUsage > 0)<div class="stat-sub red">Melebihi 10 L/100km</div>@endif
@@ -37,7 +37,7 @@
                 @endforeach
             </select>
         </form>
-        <button class="btn btn-primary" onclick="document.getElementById('addFuelModal').classList.add('open')">+ Log Pengisian</button>
+        <button class="btn btn-primary" onclick="document.getElementById('addFuelModal').classList.add('open')"><x-icon name="plus" :size="16" /> Log Pengisian</button>
     </div>
 
     <div class="card">
@@ -61,7 +61,7 @@
                         @else — @endif
                     </td>
                     <td>
-                        <button class="btn btn-sm btn-secondary" onclick="openFuelDetail({{ $r->id }})">📎</button>
+                        <button class="btn btn-sm btn-secondary" onclick="openFuelDetail({{ $r->id }})"><x-icon name="file-text" :size="13" /></button>
                         @if($r->files->count())<span style="font-size:10px;color:var(--c-muted)">{{ $r->files->count() }}</span>@endif
                     </td>
                 </tr>
@@ -76,7 +76,7 @@
     <div class="modal-overlay" id="addFuelModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">⛽ Log Pengisian Bahan Api</div>
+                <div class="modal-title"><x-icon name="fuel" :size="18" /> Log Pengisian Bahan Api</div>
                 <div class="modal-close" onclick="closeModal('addFuelModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('fuel.store') }}">
@@ -113,7 +113,6 @@
                     </div>
                 </div>
                 <div class="alert alert-info" style="margin-top:4px">
-                    <span>ℹ️</span>
                     <div style="font-size:12px">Penggunaan L/100km dikira automatik berdasarkan perbezaan odometer dengan rekod sebelumnya.</div>
                 </div>
                 <div class="modal-footer">
@@ -128,7 +127,7 @@
     <div class="modal-overlay" id="fuelDetailModal">
         <div class="modal" style="max-width:480px">
             <div class="modal-header">
-                <div class="modal-title" id="fdTitle">📎 Lampiran Resit</div>
+                <div class="modal-title" id="fdTitle"><x-icon name="file-text" :size="18" /> Lampiran Resit</div>
                 <div class="modal-close" onclick="closeModal('fuelDetailModal')">✕</div>
             </div>
             <div id="fdBody"></div>
@@ -149,7 +148,7 @@
     function openFuelDetail(id) {
         const f = fuelData[id];
         if (!f) return;
-        document.getElementById('fdTitle').textContent = '📎 Resit — ' + f.vehicle.plat + ' (' + new Date(f.datetime).toLocaleDateString('ms-MY') + ')';
+        document.getElementById('fdTitle').textContent = 'Resit — ' + f.vehicle.plat + ' (' + new Date(f.datetime).toLocaleDateString('ms-MY') + ')';
         document.getElementById('fdBody').innerHTML = `
             <div class="detail-row"><div class="detail-label">Kenderaan</div><div class="detail-val"><strong>${f.vehicle.plat}</strong> — ${f.vehicle.model}</div></div>
             <div class="detail-row"><div class="detail-label">Tarikh</div><div class="detail-val">${new Date(f.datetime).toLocaleDateString('ms-MY',{day:'numeric',month:'long',year:'numeric'})}</div></div>

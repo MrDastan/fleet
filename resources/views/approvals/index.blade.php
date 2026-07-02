@@ -1,30 +1,30 @@
 <x-fleet-layout title="Permohonan Kenderaan">
     <div class="page-header">
-        <h2>Permohonan Kenderaan</h2>
+        <h1>Permohonan Kenderaan</h1>
         <p>Sistem kelulusan 3 peringkat: Staff Mohon → Penjaga Sahkan → Fleet Luluskan</p>
     </div>
 
     <!-- Stats -->
     <div class="stats-grid" style="margin-bottom:20px">
-        <a href="{{ route('approvals.index') }}" class="stat-card" style="border-top:3px solid var(--c-accent);text-decoration:none">
-            <div class="stat-icon" style="background:#fff0e8">📋</div>
+        <a href="{{ route('approvals.index') }}" class="stat-card" style="text-decoration:none">
+            <div class="stat-icon soft-accent"><x-icon name="clipboard-check" :size="18" /></div>
             <div class="stat-val">{{ $counts['all'] }}</div>
             <div class="stat-label">Jumlah Permohonan</div>
         </a>
-        <a href="{{ route('approvals.index', ['status' => 'pending_guard']) }}" class="stat-card" style="border-top:3px solid var(--c-accent);text-decoration:none">
-            <div class="stat-icon" style="background:#fff3e0">⏳</div>
+        <a href="{{ route('approvals.index', ['status' => 'pending_guard']) }}" class="stat-card" style="text-decoration:none">
+            <div class="stat-icon soft-warn"><x-icon name="clock" :size="18" /></div>
             <div class="stat-val">{{ $counts['pending_guard'] }}</div>
             <div class="stat-label">Menunggu Penjaga</div>
             @if($counts['pending_guard'] > 0)<div class="stat-sub orange">Perlu tindakan segera</div>@endif
         </a>
-        <a href="{{ route('approvals.index', ['status' => 'pending_fleet']) }}" class="stat-card" style="border-top:3px solid #1a4fa0;text-decoration:none">
-            <div class="stat-icon" style="background:#e8f0fb">📝</div>
+        <a href="{{ route('approvals.index', ['status' => 'pending_fleet']) }}" class="stat-card" style="text-decoration:none">
+            <div class="stat-icon soft-info"><x-icon name="file-text" :size="18" /></div>
             <div class="stat-val">{{ $counts['pending_fleet'] }}</div>
             <div class="stat-label">Menunggu Fleet</div>
-            @if($counts['pending_fleet'] > 0)<div class="stat-sub" style="color:#1a4fa0">Perlu semakan</div>@endif
+            @if($counts['pending_fleet'] > 0)<div class="stat-sub" style="color:var(--info)">Perlu semakan</div>@endif
         </a>
-        <a href="{{ route('approvals.index', ['status' => 'approved']) }}" class="stat-card" style="border-top:3px solid var(--c-ok);text-decoration:none">
-            <div class="stat-icon" style="background:#e8fff6">✅</div>
+        <a href="{{ route('approvals.index', ['status' => 'approved']) }}" class="stat-card" style="text-decoration:none">
+            <div class="stat-icon soft-ok"><x-icon name="check" :size="18" /></div>
             <div class="stat-val">{{ $counts['approved'] }}</div>
             <div class="stat-label">Diluluskan</div>
         </a>
@@ -33,12 +33,10 @@
     <!-- Role-specific alert -->
     @if($role === 'guard' && $counts['pending_guard'] > 0)
         <div class="alert alert-warn">
-            <span>👋</span>
             <div><strong>Penjaga:</strong> {{ $counts['pending_guard'] }} permohonan menunggu pengesahan anda. Sila semak ketersediaan dan kondisi kenderaan.</div>
         </div>
     @elseif($role === 'fleet' && $counts['pending_fleet'] > 0)
         <div class="alert alert-warn">
-            <span>👋</span>
             <div><strong>Fleet:</strong> {{ $counts['pending_fleet'] }} permohonan telah disahkan penjaga. Sila nilai dan luluskan.</div>
         </div>
     @endif
@@ -46,19 +44,19 @@
     <!-- Tabs -->
     <div class="tabs">
         <a href="{{ route('approvals.index') }}" class="tab {{ !request('status') ? 'active' : '' }}">Semua ({{ $counts['all'] }})</a>
-        <a href="{{ route('approvals.index', ['status' => 'pending_guard']) }}" class="tab {{ request('status') === 'pending_guard' ? 'active' : '' }}">⏳ Penjaga ({{ $counts['pending_guard'] }})</a>
-        <a href="{{ route('approvals.index', ['status' => 'pending_fleet']) }}" class="tab {{ request('status') === 'pending_fleet' ? 'active' : '' }}">📝 Fleet ({{ $counts['pending_fleet'] }})</a>
-        <a href="{{ route('approvals.index', ['status' => 'approved']) }}" class="tab {{ request('status') === 'approved' ? 'active' : '' }}">✅ Lulus ({{ $counts['approved'] }})</a>
-        <a href="{{ route('approvals.index', ['status' => 'rejected']) }}" class="tab {{ request('status') === 'rejected' ? 'active' : '' }}">❌ Tolak ({{ $counts['rejected'] }})</a>
-        <a href="{{ route('approvals.index', ['status' => 'completed']) }}" class="tab {{ request('status') === 'completed' ? 'active' : '' }}">🏁 Selesai ({{ $counts['completed'] }})</a>
+        <a href="{{ route('approvals.index', ['status' => 'pending_guard']) }}" class="tab {{ request('status') === 'pending_guard' ? 'active' : '' }}">Penjaga ({{ $counts['pending_guard'] }})</a>
+        <a href="{{ route('approvals.index', ['status' => 'pending_fleet']) }}" class="tab {{ request('status') === 'pending_fleet' ? 'active' : '' }}">Fleet ({{ $counts['pending_fleet'] }})</a>
+        <a href="{{ route('approvals.index', ['status' => 'approved']) }}" class="tab {{ request('status') === 'approved' ? 'active' : '' }}">Lulus ({{ $counts['approved'] }})</a>
+        <a href="{{ route('approvals.index', ['status' => 'rejected']) }}" class="tab {{ request('status') === 'rejected' ? 'active' : '' }}">Tolak ({{ $counts['rejected'] }})</a>
+        <a href="{{ route('approvals.index', ['status' => 'completed']) }}" class="tab {{ request('status') === 'completed' ? 'active' : '' }}">Selesai ({{ $counts['completed'] }})</a>
     </div>
 
     <div class="search-bar">
         <form method="GET" action="{{ route('approvals.index') }}" style="display:flex;gap:10px;flex:1;flex-wrap:wrap">
-            <input type="text" name="search" class="form-control search-input" placeholder="🔍  Cari pemohon, no. plat..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control search-input" placeholder="Cari pemohon, no. plat..." value="{{ request('search') }}">
             @if(request('status'))<input type="hidden" name="status" value="{{ request('status') }}">@endif
         </form>
-        <button class="btn btn-primary" onclick="document.getElementById('newApprovalModal').classList.add('open')">+ Mohon Kenderaan</button>
+        <button class="btn btn-primary" onclick="document.getElementById('newApprovalModal').classList.add('open')"><x-icon name="plus" :size="16" /> Mohon Kenderaan</button>
     </div>
 
     <!-- Table -->
@@ -72,11 +70,11 @@
                 @php
                     $stageLabels = [1 => 'Peringkat 1/3', 2 => 'Peringkat 2/3', 3 => 'Peringkat 3/3', 4 => 'Selesai'];
                     $statusBadges = [
-                        'pending_guard' => '<span class="badge-pill badge-warn">⏳ Menunggu Penjaga</span>',
-                        'pending_fleet' => '<span class="badge-pill badge-info">📝 Menunggu Fleet</span>',
-                        'approved' => '<span class="badge-pill badge-ok">✅ Diluluskan</span>',
-                        'rejected' => '<span class="badge-pill badge-danger">❌ Ditolak</span>',
-                        'completed' => '<span class="badge-pill badge-neutral">🏁 Selesai</span>',
+                        'pending_guard' => '<span class="badge-pill badge-warn">Menunggu Penjaga</span>',
+                        'pending_fleet' => '<span class="badge-pill badge-info">Menunggu Fleet</span>',
+                        'approved' => '<span class="badge-pill badge-ok">Diluluskan</span>',
+                        'rejected' => '<span class="badge-pill badge-danger">Ditolak</span>',
+                        'completed' => '<span class="badge-pill badge-neutral">Selesai</span>',
                     ];
                     $canGuard = $role === 'guard' && $a->status === 'pending_guard';
                     $canFleet = in_array($role, ['fleet', 'admin']) && $a->status === 'pending_fleet';
@@ -101,11 +99,11 @@
                             <button class="btn btn-sm btn-primary" onclick="openFleetModal({{ $a->id }})">Nilai</button>
                         @endif
                         @if($canOverride)
-                            <button class="btn btn-sm" style="background:#7c3aed;color:#fff;font-size:11px;padding:4px 8px;border-radius:6px;border:none;cursor:pointer" onclick="openOverrideModal({{ $a->id }})">⚡</button>
+                            <button class="btn btn-sm" style="background:#7c3aed;color:#fff;padding:8px;border-radius:8px;border:none;cursor:pointer" onclick="openOverrideModal({{ $a->id }})"><x-icon name="zap" :size="13" /></button>
                         @endif
                         @if($canComplete)
                             <form method="POST" action="{{ route('approvals.complete', $a) }}" style="display:inline">@csrf @method('PUT')
-                                <button class="btn btn-sm btn-secondary" type="submit">🏁</button>
+                                <button class="btn btn-sm btn-secondary" type="submit"><x-icon name="flag" :size="13" /></button>
                             </form>
                         @endif
                     </td>
@@ -119,33 +117,33 @@
 
     <!-- Flow chart -->
     <div class="card">
-        <div class="card-header"><span class="card-title">🔄 Carta Aliran Kelulusan</span></div>
+        <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="route" :size="17" /></span>Carta Aliran Kelulusan</span></div>
         <div class="card-body">
             <div style="display:flex;align-items:flex-start;gap:0;overflow-x:auto;padding-bottom:8px">
                 @foreach([
-                    ['icon' => '👤', 'bg' => '#fff0e8', 'border' => 'var(--c-sky)', 'title' => 'Staff Mohon', 'sub' => 'Isi tarikh, tujuan & destinasi', 'badge' => 'Peringkat 1', 'badgeClass' => 'badge-neutral'],
-                    ['icon' => '🔑', 'bg' => '#e8fff6', 'border' => 'var(--c-ok)', 'title' => 'Penjaga Sahkan', 'sub' => 'Semak kondisi & ketersediaan', 'badge' => 'Peringkat 2', 'badgeClass' => 'badge-ok'],
-                    ['icon' => '🚗', 'bg' => '#e8f0fb', 'border' => '#1a4fa0', 'title' => 'Fleet Luluskan', 'sub' => 'Nilai keutamaan & polisi', 'badge' => 'Peringkat 3', 'badgeClass' => 'badge-info'],
-                    ['icon' => '✅', 'bg' => '#e8fff6', 'border' => 'var(--c-ok)', 'title' => 'Kenderaan Sedia', 'sub' => 'Ambil kunci, log keluar', 'badge' => 'Selesai', 'badgeClass' => 'badge-ok'],
+                    ['icon' => 'clipboard-check', 'kind' => 'accent', 'title' => 'Staff Mohon', 'sub' => 'Isi tarikh, tujuan & destinasi', 'badge' => 'Peringkat 1', 'badgeClass' => 'badge-neutral'],
+                    ['icon' => 'key', 'kind' => 'ok', 'title' => 'Penjaga Sahkan', 'sub' => 'Semak kondisi & ketersediaan', 'badge' => 'Peringkat 2', 'badgeClass' => 'badge-ok'],
+                    ['icon' => 'car', 'kind' => 'info', 'title' => 'Fleet Luluskan', 'sub' => 'Nilai keutamaan & polisi', 'badge' => 'Peringkat 3', 'badgeClass' => 'badge-info'],
+                    ['icon' => 'check', 'kind' => 'ok', 'title' => 'Kenderaan Sedia', 'sub' => 'Ambil kunci, log keluar', 'badge' => 'Selesai', 'badgeClass' => 'badge-ok'],
                 ] as $i => $step)
                     @if($i > 0)
                     <div style="flex:1;display:flex;align-items:center;padding-top:22px;min-width:30px">
-                        <div style="flex:1;height:2px;background:var(--c-border)"></div>
-                        <div style="font-size:10px;color:var(--c-muted);white-space:nowrap;padding:0 4px">→</div>
-                        <div style="flex:1;height:2px;background:var(--c-border)"></div>
+                        <div style="flex:1;height:2px;background:var(--border)"></div>
+                        <div style="font-size:10px;color:var(--muted);white-space:nowrap;padding:0 4px">→</div>
+                        <div style="flex:1;height:2px;background:var(--border)"></div>
                     </div>
                     @endif
                     <div style="display:flex;flex-direction:column;align-items:center;min-width:120px">
-                        <div style="width:44px;height:44px;border-radius:50%;background:{{ $step['bg'] }};border:2px solid {{ $step['border'] }};display:flex;align-items:center;justify-content:center;font-size:20px">{{ $step['icon'] }}</div>
+                        <div class="soft-{{ $step['kind'] }}" style="width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center"><x-icon :name="$step['icon']" :size="19" /></div>
                         <div style="font-size:12px;font-weight:600;margin-top:6px;text-align:center">{{ $step['title'] }}</div>
-                        <div style="font-size:11px;color:var(--c-muted);text-align:center;margin-top:2px">{{ $step['sub'] }}</div>
+                        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:2px">{{ $step['sub'] }}</div>
                         <span class="badge-pill {{ $step['badgeClass'] }}" style="margin-top:6px;font-size:10px">{{ $step['badge'] }}</span>
                     </div>
                 @endforeach
             </div>
             @if($role === 'admin')
-            <div style="margin-top:14px;padding:10px 14px;background:var(--c-bg);border-radius:8px;border-left:3px solid #7c3aed;font-size:12px;color:var(--c-muted)">
-                <strong style="color:#5b21b6">⚡ Admin Override:</strong> Admin boleh lulus atau batal permohonan pada mana-mana peringkat tanpa menunggu giliran.
+            <div style="margin-top:14px;padding:10px 14px;background:var(--bg);border-radius:10px;border-left:3px solid #7c3aed;font-size:12px;color:var(--muted)">
+                <strong style="color:#5b21b6">Admin Override:</strong> Admin boleh lulus atau batal permohonan pada mana-mana peringkat tanpa menunggu giliran.
             </div>
             @endif
         </div>
@@ -155,11 +153,11 @@
     <div class="modal-overlay" id="newApprovalModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">📋 Permohonan Kenderaan Baharu</div>
+                <div class="modal-title"><x-icon name="clipboard-check" :size="18" /> Permohonan Kenderaan Baharu</div>
                 <div class="modal-close" onclick="closeModal('newApprovalModal')">✕</div>
             </div>
             <div class="alert alert-info" style="margin-bottom:14px">
-                <span>ℹ️</span><div>Permohonan akan melalui <strong>2 peringkat kelulusan</strong>: Penjaga (30 min) → Fleet (2 jam).</div>
+                <div>Permohonan akan melalui <strong>2 peringkat kelulusan</strong>: Penjaga (30 min) → Fleet (2 jam).</div>
             </div>
             <form method="POST" action="{{ route('approvals.store') }}">
                 @csrf
@@ -197,7 +195,7 @@
     <div class="modal-overlay" id="guardModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">🔑 Tindakan Penjaga — Peringkat 2</div>
+                <div class="modal-title"><x-icon name="key" :size="18" /> Tindakan Penjaga — Peringkat 2</div>
                 <div class="modal-close" onclick="closeModal('guardModal')">✕</div>
             </div>
             <div id="guardInfo" style="background:var(--c-bg);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px"></div>
@@ -214,9 +212,9 @@
                 <div class="form-group"><label class="form-label">Odometer Semasa (km)</label><input name="guard_odometer" class="form-control" type="number" placeholder="Bacaan odometer"></div>
                 <div class="form-group"><label class="form-label">Catatan Penjaga</label><textarea name="guard_note" class="form-control" rows="2" placeholder="Catatan kondisi..."></textarea></div>
                 <div class="modal-footer">
-                    <button type="submit" name="action" value="reject" class="btn btn-danger">❌ Tolak</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">Tolak</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('guardModal')">Batal</button>
-                    <button type="submit" name="action" value="approve" class="btn btn-primary">✅ Sahkan & Hantar ke Fleet</button>
+                    <button type="submit" name="action" value="approve" class="btn btn-primary">Sahkan & Hantar ke Fleet</button>
                 </div>
             </form>
         </div>
@@ -226,12 +224,12 @@
     <div class="modal-overlay" id="fleetModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">🚗 Tindakan Fleet — Peringkat 3</div>
+                <div class="modal-title"><x-icon name="car" :size="18" /> Tindakan Fleet — Peringkat 3</div>
                 <div class="modal-close" onclick="closeModal('fleetModal')">✕</div>
             </div>
             <div id="fleetInfo" style="background:var(--c-bg);border-radius:8px;padding:12px;margin-bottom:16px;font-size:13px"></div>
-            <div style="background:#e8fff6;border-radius:8px;padding:10px 14px;margin-bottom:16px;font-size:12px;border-left:3px solid var(--c-ok)">
-                <strong style="color:#007a5e">✅ Penjaga telah sahkan:</strong> <span id="fleetGuardNote"></span>
+            <div style="background:#E3F2EA;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;border-left:3px solid var(--ok)">
+                <strong style="color:var(--ok)">Penjaga telah sahkan:</strong> <span id="fleetGuardNote"></span>
             </div>
             <form method="POST" id="fleetForm">
                 @csrf @method('PUT')
@@ -244,9 +242,9 @@
                 </div>
                 <div class="form-group"><label class="form-label">Syarat / Arahan Khas</label><textarea name="fleet_note" class="form-control" rows="2" placeholder="Contoh: Pulang sebelum 5pm..."></textarea></div>
                 <div class="modal-footer">
-                    <button type="submit" name="action" value="reject" class="btn btn-danger">❌ Tolak</button>
+                    <button type="submit" name="action" value="reject" class="btn btn-danger">Tolak</button>
                     <button type="button" class="btn btn-secondary" onclick="closeModal('fleetModal')">Batal</button>
-                    <button type="submit" name="action" value="approve" class="btn btn-primary">✅ Luluskan</button>
+                    <button type="submit" name="action" value="approve" class="btn btn-primary">Luluskan</button>
                 </div>
             </form>
         </div>
@@ -256,17 +254,17 @@
     <div class="modal-overlay" id="overrideModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">⚡ Admin Override</div>
+                <div class="modal-title"><x-icon name="zap" :size="18" /> Admin Override</div>
                 <div class="modal-close" onclick="closeModal('overrideModal')">✕</div>
             </div>
-            <div class="alert alert-warn"><span>⚠️</span><div>Override akan <strong>melepasi semua peringkat</strong> kelulusan. Tindakan direkodkan.</div></div>
+            <div class="alert alert-warn"><x-icon name="triangle-alert" :size="16" /><div>Override akan <strong>melepasi semua peringkat</strong> kelulusan. Tindakan direkodkan.</div></div>
             <div id="overrideInfo" style="background:var(--c-bg);border-radius:8px;padding:12px;margin:14px 0;font-size:13px"></div>
             <form method="POST" id="overrideForm">
                 @csrf @method('PUT')
                 <div class="form-group"><label class="form-label">Tindakan *</label>
                     <select name="override_action" class="form-control">
-                        <option value="approve">✅ Lulus segera (skip semua peringkat)</option>
-                        <option value="reject">❌ Tolak permohonan</option>
+                        <option value="approve">Lulus segera (skip semua peringkat)</option>
+                        <option value="reject">Tolak permohonan</option>
                     </select>
                 </div>
                 <div class="form-group"><label class="form-label">Sebab Override * (wajib untuk audit)</label>
@@ -274,7 +272,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('overrideModal')">Batal</button>
-                    <button type="submit" class="btn btn-primary">⚡ Sahkan Override</button>
+                    <button type="submit" class="btn btn-primary">Sahkan Override</button>
                 </div>
             </form>
         </div>
@@ -326,11 +324,11 @@
     function viewDetail(id) {
         const a = approvalData[id];
         const statusMap = {
-            pending_guard: '⏳ Menunggu Penjaga',
-            pending_fleet: '📝 Menunggu Fleet',
-            approved: '✅ Diluluskan',
-            rejected: '❌ Ditolak',
-            completed: '🏁 Selesai'
+            pending_guard: 'Menunggu Penjaga',
+            pending_fleet: 'Menunggu Fleet',
+            approved: 'Diluluskan',
+            rejected: 'Ditolak',
+            completed: 'Selesai'
         };
         let html = `
             <div class="detail-row"><div class="detail-label">No. Permohonan</div><div class="detail-val"><strong style="font-family:monospace">${a.request_no}</strong></div></div>
@@ -345,7 +343,7 @@
         if (a.guard_note) html += `<div class="detail-row"><div class="detail-label">Catatan Penjaga</div><div class="detail-val">${a.guard_note}</div></div>`;
         if (a.fleet_note) html += `<div class="detail-row"><div class="detail-label">Catatan Fleet</div><div class="detail-val">${a.fleet_note}</div></div>`;
         if (a.fleet_priority) html += `<div class="detail-row"><div class="detail-label">Keutamaan</div><div class="detail-val">${a.fleet_priority}</div></div>`;
-        if (a.admin_override_reason) html += `<div class="detail-row"><div class="detail-label">⚡ Override</div><div class="detail-val">${a.admin_override_reason}</div></div>`;
+        if (a.admin_override_reason) html += `<div class="detail-row"><div class="detail-label">Override</div><div class="detail-val">${a.admin_override_reason}</div></div>`;
         if (a.passengers) html += `<div class="detail-row"><div class="detail-label">Penumpang</div><div class="detail-val">${a.passengers}</div></div>`;
         if (a.notes) html += `<div class="detail-row"><div class="detail-label">Catatan</div><div class="detail-val">${a.notes}</div></div>`;
 

@@ -1,6 +1,6 @@
 <x-fleet-layout title="Road Tax & Insuran">
     <div class="page-header">
-        <h2>Road Tax & Insuran</h2>
+        <h1>Road Tax & Insuran</h1>
         <p>Pantau tarikh luput road tax dan polisi insuran semua kenderaan</p>
     </div>
 
@@ -30,11 +30,12 @@
     <div class="card">
         <div class="card-header">
             <span class="card-title">
-                @if($tab === 'roadtax') 📄 Senarai Road Tax
-                @elseif($tab === 'insuran') 🛡️ Senarai Insuran
-                @else 📋 Senarai Puspakom @endif
+                <span class="icon-accent"><x-icon :name="$tab === 'roadtax' ? 'file-text' : ($tab === 'insuran' ? 'shield' : 'clipboard-check')" :size="17" /></span>
+                @if($tab === 'roadtax') Senarai Road Tax
+                @elseif($tab === 'insuran') Senarai Insuran
+                @else Senarai Puspakom @endif
             </span>
-            <button class="btn btn-sm btn-primary" onclick="document.getElementById('addRoadtaxModal').classList.add('open')">+ Kemaskini</button>
+            <button class="btn btn-sm btn-primary" onclick="document.getElementById('addRoadtaxModal').classList.add('open')"><x-icon name="plus" :size="15" /> Kemaskini</button>
         </div>
         <table class="fleet-table">
             <thead>
@@ -68,7 +69,7 @@
                         <td>{{ $expiry?->format('d M Y') ?? '—' }}</td>
                         <td><span style="color:{{ $color }};font-weight:700">{{ $expiry ? $days . ' hari' : '—' }}</span></td>
                         <td>
-                            @if($days <= 7)<span class="badge-pill badge-danger">⚠ Urgent</span>
+                            @if($days <= 7)<span class="badge-pill badge-danger">Urgent</span>
                             @elseif($days <= 30)<span class="badge-pill badge-warn">Segera</span>
                             @else<span class="badge-pill badge-ok">Aktif</span>@endif
                         </td>
@@ -87,7 +88,7 @@
 
     @if($records->where('doc_type', $tab)->count())
     <div class="card" style="margin-top:20px">
-        <div class="card-header"><span class="card-title">📂 Sejarah Pembaharuan</span></div>
+        <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="file-text" :size="17" /></span>Sejarah Pembaharuan</span></div>
         <table class="fleet-table">
             <thead><tr><th>No. Plat</th><th>Jenis</th><th>Tarikh Mula</th><th>Tarikh Luput</th><th>Jumlah</th><th>No. Polisi</th></tr></thead>
             <tbody>
@@ -110,7 +111,7 @@
     <div class="modal-overlay" id="addRoadtaxModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="rtModalTitle">📄 Kemaskini Road Tax / Insuran</div>
+                <div class="modal-title" id="rtModalTitle"><x-icon name="file-text" :size="18" /> Kemaskini Road Tax / Insuran</div>
                 <div class="modal-close" onclick="closeModal('addRoadtaxModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('roadtax.store') }}">
@@ -148,7 +149,7 @@
     function openRenew(vehicleId, plat, docType) {
         document.getElementById('rtVehicle').value = vehicleId;
         document.getElementById('rtDocType').value = docType;
-        document.getElementById('rtModalTitle').textContent = '📄 Perbaharui ' + (docType === 'insuran' ? 'Insuran' : docType === 'puspakom' ? 'Puspakom' : 'Road Tax') + ' — ' + plat;
+        document.getElementById('rtModalTitle').textContent = 'Perbaharui ' + (docType === 'insuran' ? 'Insuran' : docType === 'puspakom' ? 'Puspakom' : 'Road Tax') + ' — ' + plat;
         document.getElementById('addRoadtaxModal').classList.add('open');
     }
     function closeModal(id) { document.getElementById(id).classList.remove('open'); }

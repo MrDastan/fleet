@@ -1,6 +1,6 @@
 <x-fleet-layout title="Servis & Penyelenggaraan">
     <div class="page-header">
-        <h2>Pengurusan Servis</h2>
+        <h1>Pengurusan Servis</h1>
         <p>Rekod servis, penyelenggaraan dan pembaikan kenderaan</p>
     </div>
 
@@ -13,10 +13,10 @@
 
     <div class="search-bar">
         <form method="GET" action="{{ route('services.index') }}" style="display:flex;gap:10px;flex:1">
-            <input type="text" name="search" class="form-control search-input" placeholder="🔍  Cari rekod servis..." value="{{ request('search') }}">
+            <input type="text" name="search" class="form-control search-input" placeholder="Cari rekod servis..." value="{{ request('search') }}">
             @if(request('status'))<input type="hidden" name="status" value="{{ request('status') }}">@endif
         </form>
-        <button class="btn btn-primary" onclick="document.getElementById('addServisModal').classList.add('open')">+ Rekod Baharu</button>
+        <button class="btn btn-primary" onclick="document.getElementById('addServisModal').classList.add('open')"><x-icon name="plus" :size="16" /> Rekod Baharu</button>
     </div>
 
     <div class="card">
@@ -53,7 +53,7 @@
     <div class="modal-overlay" id="addServisModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title">🔧 Rekod Servis Baharu</div>
+                <div class="modal-title"><x-icon name="wrench" :size="18" /> Rekod Servis Baharu</div>
                 <div class="modal-close" onclick="closeModal('addServisModal')">✕</div>
             </div>
             <form method="POST" action="{{ route('services.store') }}">
@@ -97,7 +97,7 @@
     <div class="modal-overlay" id="serviceDetailModal">
         <div class="modal">
             <div class="modal-header">
-                <div class="modal-title" id="svcDetailTitle">🔧 Detail Servis</div>
+                <div class="modal-title" id="svcDetailTitle"><x-icon name="wrench" :size="18" /> Detail Servis</div>
                 <div class="modal-close" onclick="closeModal('serviceDetailModal')">✕</div>
             </div>
             <div id="svcDetailBody"></div>
@@ -139,7 +139,7 @@
             : s.status === 'dalam_proses' ? '<span class="badge-pill badge-warn">Dalam Proses</span>'
             : '<span class="badge-pill badge-info">Dijadual</span>';
 
-        document.getElementById('svcDetailTitle').innerHTML = '🔧 Detail Servis — ' + v.plat;
+        document.getElementById('svcDetailTitle').textContent = 'Detail Servis — ' + v.plat;
         document.getElementById('svcDetailBody').innerHTML = `
             <div class="detail-row"><div class="detail-label">No. Plat</div><div class="detail-val"><strong>${v.plat}</strong></div></div>
             <div class="detail-row"><div class="detail-label">Model</div><div class="detail-val">${v.model} ${v.year || ''}</div></div>
