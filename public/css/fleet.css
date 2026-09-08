@@ -152,6 +152,7 @@ nav#sideNav { padding: 0 12px; flex: 1; }
 .main {
   margin-left: var(--sidebar-w);
   flex: 1;
+  min-width: 0;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
