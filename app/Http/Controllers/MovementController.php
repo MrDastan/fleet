@@ -42,7 +42,12 @@ class MovementController extends Controller
             'km_out' => 'nullable|integer',
             'checkout_time' => 'required|date',
             'guard_notes' => 'nullable|string',
+            'checkout_photo' => 'nullable|image|max:5120',
         ]);
+
+        if ($request->hasFile('checkout_photo')) {
+            $validated['checkout_photo'] = $request->file('checkout_photo')->store('uploads/movements', 'public');
+        }
 
         $validated['driver_user_id'] = auth()->id();
         $validated['status'] = 'di_luar';
@@ -63,12 +68,18 @@ class MovementController extends Controller
             'km_in' => 'nullable|integer',
             'checkin_time' => 'required|date',
             'guard_notes' => 'nullable|string',
+            'checkin_photo' => 'nullable|image|max:5120',
         ]);
+
+        if ($request->hasFile('checkin_photo')) {
+            $validated['checkin_photo'] = $request->file('checkin_photo')->store('uploads/movements', 'public');
+        }
 
         $movement->update([
             'checkin_time' => $validated['checkin_time'],
             'km_in' => $validated['km_in'],
             'guard_notes' => $validated['guard_notes'] ?? $movement->guard_notes,
+            'checkin_photo' => $validated['checkin_photo'] ?? $movement->checkin_photo,
             'status' => 'kembali',
         ]);
 

@@ -10,6 +10,7 @@ class MovementLog extends Model
     protected $fillable = [
         'vehicle_id', 'driver_user_id', 'department', 'purpose', 'destination',
         'checkout_time', 'checkin_time', 'km_out', 'km_in', 'guard_notes', 'status',
+        'checkout_photo', 'checkin_photo',
     ];
 
     protected function casts(): array
@@ -28,5 +29,15 @@ class MovementLog extends Model
     public function driver(): BelongsTo
     {
         return $this->belongsTo(User::class, 'driver_user_id');
+    }
+
+    public function getCheckoutPhotoUrlAttribute(): ?string
+    {
+        return $this->checkout_photo ? asset('storage/' . $this->checkout_photo) : null;
+    }
+
+    public function getCheckinPhotoUrlAttribute(): ?string
+    {
+        return $this->checkin_photo ? asset('storage/' . $this->checkin_photo) : null;
     }
 }

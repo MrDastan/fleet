@@ -31,6 +31,7 @@
                     <th>Masa Masuk</th>
                     <th>Km Keluar</th>
                     <th>Km Masuk</th>
+                    <th>Gambar</th>
                     <th>Status</th>
                     <th>Tindakan</th>
                 </tr>
@@ -46,6 +47,23 @@
                     <td>{{ $l->checkin_time?->format('H:i') ?? '—' }}</td>
                     <td>{{ $l->km_out ? number_format($l->km_out) : '—' }}</td>
                     <td>{{ $l->km_in ? number_format($l->km_in) : '—' }}</td>
+                    <td>
+                        <div style="display:flex;gap:4px">
+                            @if($l->checkout_photo)
+                                <a href="{{ $l->checkout_photo_url }}" target="_blank" title="Gambar keluar">
+                                    <img src="{{ $l->checkout_photo_url }}" style="width:28px;height:28px;object-fit:cover;border-radius:5px;border:1px solid var(--c-border)">
+                                </a>
+                            @endif
+                            @if($l->checkin_photo)
+                                <a href="{{ $l->checkin_photo_url }}" target="_blank" title="Gambar masuk">
+                                    <img src="{{ $l->checkin_photo_url }}" style="width:28px;height:28px;object-fit:cover;border-radius:5px;border:1px solid var(--c-border)">
+                                </a>
+                            @endif
+                            @if(!$l->checkout_photo && !$l->checkin_photo)
+                                <span style="color:var(--c-muted)">—</span>
+                            @endif
+                        </div>
+                    </td>
                     <td>
                         @if($l->status === 'di_luar')
                             <span class="badge-pill badge-ok">Di Luar</span>
@@ -64,7 +82,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="10" style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod pergerakan untuk tarikh ini</td></tr>
+                <tr><td colspan="11" style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod pergerakan untuk tarikh ini</td></tr>
                 @endforelse
             </tbody>
         </table>
@@ -77,7 +95,7 @@
                 <div class="modal-title"><x-icon name="clipboard-check" :size="18" /> Log Keluar Kenderaan</div>
                 <div class="modal-close" onclick="closeModal('checkoutModal')">✕</div>
             </div>
-            <form method="POST" action="{{ route('movements.store') }}">
+            <form method="POST" action="{{ route('movements.store') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="form-row">
                     <div class="form-group"><label class="form-label">Kenderaan *</label>
@@ -109,6 +127,9 @@
                 <div class="form-group"><label class="form-label">Catatan Penjaga</label>
                     <textarea name="guard_notes" class="form-control" rows="2" placeholder="Kondisi kenderaan, nota..."></textarea>
                 </div>
+                <div class="form-group"><label class="form-label">Gambar Kenderaan (semasa ambil)</label>
+                    <input type="file" name="checkout_photo" class="form-control" accept="image/*" capture="environment">
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('checkoutModal')">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan Log Keluar</button>
@@ -124,7 +145,7 @@
                 <div class="modal-title" id="checkinTitle"><x-icon name="clipboard-check" :size="18" /> Log Masuk Kenderaan</div>
                 <div class="modal-close" onclick="closeModal('checkinModal')">✕</div>
             </div>
-            <form method="POST" id="checkinForm">
+            <form method="POST" id="checkinForm" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="form-row">
@@ -138,6 +159,9 @@
                 <div class="form-group"><label class="form-label">Catatan</label>
                     <textarea name="guard_notes" class="form-control" rows="2" placeholder="Kondisi pulangan, kerosakan..."></textarea>
                 </div>
+                <div class="form-group"><label class="form-label">Gambar Kenderaan (semasa hantar)</label>
+                    <input type="file" name="checkin_photo" class="form-control" accept="image/*" capture="environment">
+                </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('checkinModal')">Batal</button>
                     <button type="submit" class="btn btn-primary">Simpan Log Masuk</button>
@@ -150,7 +174,7 @@
     function openCheckin(id, plat, kmOut) {
         document.getElementById('checkinTitle').textContent = 'Log Masuk — ' + plat;
         document.getElementById('checkinForm').action = '/movements/' + id + '/checkin';
-        document.getElementById('checkinKm').value = '';
+        document.getElementById('checkinForm').reset();
         document.getElementById('checkinKm').placeholder = kmOut ? 'Min: ' + kmOut.toLocaleString() : '0';
         document.getElementById('checkinModal').classList.add('open');
     }
