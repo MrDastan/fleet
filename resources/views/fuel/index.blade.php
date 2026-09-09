@@ -40,7 +40,7 @@
         <button class="btn btn-primary" onclick="document.getElementById('addFuelModal').classList.add('open')"><x-icon name="plus" :size="16" /> Log Pengisian</button>
     </div>
 
-    <div class="card">
+    <div class="card table-card-desktop">
         <table class="fleet-table">
             <thead><tr><th>Tarikh & Masa</th><th>No. Plat</th><th>Pemandu</th><th>Stesen</th><th>Liter</th><th>Harga/L</th><th>Jumlah</th><th>Odometer</th><th>L/100km</th><th></th></tr></thead>
             <tbody>
@@ -70,6 +70,30 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="mobile-cards">
+        @forelse($records as $r)
+        @php $c = $r->consumption_l100km; @endphp
+        <div class="mobile-card">
+            <div class="mobile-card-top">
+                <strong style="font-family:monospace;font-size:12px">{{ $r->vehicle->plat }}</strong>
+                @if($c)
+                    <span style="font-weight:600;font-size:12.5px;color:{{ $c > 12 ? 'var(--c-danger)' : ($c > 10 ? 'var(--c-warn)' : 'var(--c-ok)') }}">{{ number_format($c, 1) }} L/100km</span>
+                @endif
+            </div>
+            <div class="mobile-card-main">RM {{ number_format($r->total_cost, 2) }}<span class="mobile-card-muted"> · {{ number_format($r->liters, 0) }}L</span></div>
+            <div class="mobile-card-row"><x-icon name="fuel" :size="14" /> {{ $r->station ?? '—' }} · RM {{ number_format($r->price_per_liter, 2) }}/L</div>
+            <div class="mobile-card-row"><x-icon name="gauge" :size="14" /> {{ number_format($r->odometer_km) }} km</div>
+            <div class="mobile-card-row mobile-card-muted"><x-icon name="clock" :size="14" /> {{ $r->datetime->format('d M, H:i') }} · {{ $r->driver?->name ?? '—' }}</div>
+            <div class="mobile-card-actions">
+                <button class="btn btn-sm btn-secondary" onclick="openFuelDetail({{ $r->id }})"><x-icon name="file-text" :size="13" /> Resit @if($r->files->count())({{ $r->files->count() }})@endif</button>
+            </div>
+        </div>
+        @empty
+        <div style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod bahan api</div>
+        @endforelse
     </div>
 
     <!-- Add Fuel Modal -->

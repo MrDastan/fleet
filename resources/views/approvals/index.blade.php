@@ -71,7 +71,7 @@
     @endphp
 
     <!-- Table (desktop) -->
-    <div class="card mb20 approval-table-card">
+    <div class="card mb20 table-card-desktop">
         <table class="fleet-table">
             <thead>
                 <tr><th>No.</th><th>Pemohon</th><th>Kenderaan</th><th>Tarikh Guna</th><th>Tujuan</th><th>Peringkat</th><th>Status</th><th>Dihantar</th><th>Tindakan</th></tr>
@@ -119,7 +119,7 @@
     </div>
 
     <!-- Cards (mobile) -->
-    <div class="approval-cards mb20">
+    <div class="mobile-cards mb20">
         @forelse($requests as $a)
         @php
             $canGuard = $role === 'guard' && $a->status === 'pending_guard';
@@ -127,17 +127,17 @@
             $canOverride = $role === 'admin' && in_array($a->status, ['pending_guard', 'pending_fleet']);
             $canComplete = in_array($role, ['admin', 'fleet']) && $a->status === 'approved';
         @endphp
-        <div class="approval-card">
-            <div class="approval-card-top">
+        <div class="mobile-card">
+            <div class="mobile-card-top">
                 <strong style="font-family:monospace;font-size:11px">{{ $a->request_no }}</strong>
                 {!! $statusBadges[$a->status] ?? $a->status !!}
             </div>
-            <div class="approval-card-main">{{ $a->requester->name }}<span class="approval-card-muted"> · {{ $a->requester->department }}</span></div>
-            <div class="approval-card-row"><x-icon name="car" :size="14" /> <strong>{{ $a->vehicle->plat }}</strong> — {{ $a->vehicle->model }}</div>
-            <div class="approval-card-row"><x-icon name="calendar" :size="14" /> {{ $a->use_date->format('d M Y') }}, {{ $a->time_start }} – {{ $a->time_end }}</div>
-            <div class="approval-card-row"><x-icon name="map-pin" :size="14" /> {{ $a->purpose }} → {{ $a->destination }}</div>
-            <div class="approval-card-row approval-card-muted">{{ $stageLabels[$a->stage] ?? '' }} · Dihantar {{ $a->created_at->format('d M, H:i') }}</div>
-            <div class="approval-card-actions">
+            <div class="mobile-card-main">{{ $a->requester->name }}<span class="mobile-card-muted"> · {{ $a->requester->department }}</span></div>
+            <div class="mobile-card-row"><x-icon name="car" :size="14" /> <strong>{{ $a->vehicle->plat }}</strong> — {{ $a->vehicle->model }}</div>
+            <div class="mobile-card-row"><x-icon name="calendar" :size="14" /> {{ $a->use_date->format('d M Y') }}, {{ $a->time_start }} – {{ $a->time_end }}</div>
+            <div class="mobile-card-row"><x-icon name="map-pin" :size="14" /> {{ $a->purpose }} → {{ $a->destination }}</div>
+            <div class="mobile-card-row mobile-card-muted">{{ $stageLabels[$a->stage] ?? '' }} · Dihantar {{ $a->created_at->format('d M, H:i') }}</div>
+            <div class="mobile-card-actions">
                 <button class="btn btn-sm btn-secondary" onclick="viewDetail({{ $a->id }})">Detail</button>
                 @if($canGuard)
                     <button class="btn btn-sm btn-primary" onclick="openGuardModal({{ $a->id }})">Semak</button>

@@ -19,7 +19,7 @@
         <button class="btn btn-primary" onclick="document.getElementById('addServisModal').classList.add('open')"><x-icon name="plus" :size="16" /> Rekod Baharu</button>
     </div>
 
-    <div class="card">
+    <div class="card table-card-desktop">
         <table class="fleet-table">
             <thead>
                 <tr><th>No. Plat</th><th>Jenis Servis</th><th>Tarikh</th><th>Bengkel</th><th>Km</th><th>Kos</th><th>Status</th><th>Tindakan</th></tr>
@@ -47,6 +47,29 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="mobile-cards">
+        @forelse($records as $r)
+        <div class="mobile-card">
+            <div class="mobile-card-top">
+                <strong style="font-family:monospace;font-size:12px">{{ $r->vehicle->plat }}</strong>
+                @if($r->status === 'selesai')<span class="badge-pill badge-ok">Selesai</span>
+                @elseif($r->status === 'dalam_proses')<span class="badge-pill badge-warn">Dalam Proses</span>
+                @else<span class="badge-pill badge-info">Dijadual</span>@endif
+            </div>
+            <div class="mobile-card-main">{{ $r->service_type }}<span class="mobile-card-muted"> · {{ $r->vehicle->model }}</span></div>
+            <div class="mobile-card-row"><x-icon name="calendar" :size="14" /> {{ $r->date->format('d M Y') }}</div>
+            <div class="mobile-card-row"><x-icon name="map-pin" :size="14" /> {{ $r->workshop ?? 'Bengkel belum ditentukan' }}</div>
+            <div class="mobile-card-row mobile-card-muted">{{ $r->odometer_km ? number_format($r->odometer_km) . ' km' : '—' }} @if($r->cost) · RM {{ number_format($r->cost, 2) }} @endif</div>
+            <div class="mobile-card-actions">
+                <button class="btn btn-sm btn-secondary" onclick="openServiceDetail({{ $r->id }})">Detail</button>
+            </div>
+        </div>
+        @empty
+        <div style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod servis</div>
+        @endforelse
     </div>
 
     <!-- Add Service Modal -->

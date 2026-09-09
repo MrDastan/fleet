@@ -133,7 +133,7 @@
     <div class="card">
         <div class="card-header"><span class="card-title"><span class="icon-accent"><x-icon name="settings" :size="17" /></span>Tetapan Peringatan Automatik</span></div>
         <div class="card-body">
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <div class="grid-2" style="margin-bottom:0">
                 @foreach([
                     ['title' => 'ROAD TAX', 'items' => ['30 hari sebelum luput', '14 hari sebelum luput', '7 hari sebelum luput'], 'notify' => 'Admin + Fleet + Staff'],
                     ['title' => 'INSURAN', 'items' => ['60 hari sebelum luput', '30 hari sebelum luput', '14 hari sebelum luput'], 'notify' => 'Admin + Fleet'],

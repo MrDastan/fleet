@@ -53,7 +53,7 @@
         <button class="btn btn-primary" onclick="document.getElementById('addSamanModal').classList.add('open')"><x-icon name="plus" :size="16" /> Rekod Saman</button>
     </div>
 
-    <div class="card mb20">
+    <div class="card mb20 table-card-desktop">
         <table class="fleet-table">
             <thead>
                 <tr><th>No. Saman</th><th>No. Plat</th><th>Pemandu</th><th>Jenis</th><th>Kesalahan</th><th>Tarikh</th><th>Lokasi</th><th>Jumlah</th><th>Status</th><th>Tindakan</th></tr>
@@ -89,6 +89,35 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="mobile-cards mb20">
+        @forelse($records as $r)
+        <div class="mobile-card" style="{{ $r->status === 'telah_bayar' ? 'opacity:0.7' : '' }}">
+            <div class="mobile-card-top">
+                <strong style="font-family:monospace;font-size:11px">{{ $r->saman_no }}</strong>
+                @if($r->status === 'belum_bayar')<span class="badge-pill badge-danger">Belum Bayar</span>
+                @elseif($r->status === 'dalam_rayuan')<span class="badge-pill badge-warn">Dalam Rayuan</span>
+                @else<span class="badge-pill badge-ok">Telah Bayar</span>@endif
+            </div>
+            <div class="mobile-card-main">{{ $r->vehicle->plat }}<span class="mobile-card-muted"> · {{ $r->vehicle->model }}</span></div>
+            <div class="mobile-card-row"><span class="badge-pill {{ str_contains($r->saman_type, 'JPJ') ? 'badge-danger' : (str_contains($r->saman_type, 'AES') ? 'badge-info' : 'badge-warn') }}">{{ $r->saman_type }}</span> {{ $r->offense }}</div>
+            <div class="mobile-card-row"><x-icon name="map-pin" :size="14" /> {{ $r->location }}@if($r->location_detail), {{ $r->location_detail }}@endif</div>
+            <div class="mobile-card-row"><x-icon name="calendar" :size="14" /> {{ $r->date->format('d M Y') }} · <strong style="color:var(--ink)">RM {{ number_format($r->amount, 0) }}</strong></div>
+            <div class="mobile-card-actions">
+                <button class="btn btn-sm btn-secondary" onclick="openSamanDetail({{ $r->id }})">Detail</button>
+                @if($r->status !== 'telah_bayar')
+                    <button class="btn btn-sm btn-primary" onclick="openSamanUpdate({{ $r->id }}, '{{ $r->saman_no }}', '{{ $r->status }}')">Bayar</button>
+                @endif
+                @if($r->files->count())
+                    <span class="mobile-card-muted" style="font-size:11px;align-self:center">{{ $r->files->count() }} fail</span>
+                @endif
+            </div>
+        </div>
+        @empty
+        <div style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod saman</div>
+        @endforelse
     </div>
 
     <!-- Summary by vehicle -->

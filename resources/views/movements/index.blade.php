@@ -19,7 +19,8 @@
         <button class="btn btn-primary" onclick="document.getElementById('checkoutModal').classList.add('open')"><x-icon name="plus" :size="16" /> Log Keluar</button>
     </div>
 
-    <div class="card">
+    <!-- Table (desktop) -->
+    <div class="card table-card-desktop">
         <table class="fleet-table">
             <thead>
                 <tr>
@@ -86,6 +87,55 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="mobile-cards">
+        @forelse($logs as $l)
+        <div class="mobile-card">
+            <div class="mobile-card-top">
+                <strong style="font-family:monospace;font-size:12px">{{ $l->vehicle->plat }}</strong>
+                @if($l->status === 'di_luar')
+                    <span class="badge-pill badge-ok">Di Luar</span>
+                @else
+                    <span class="badge-pill badge-neutral">Kembali</span>
+                @endif
+            </div>
+            <div class="mobile-card-main">{{ $l->driver?->name ?? '—' }}<span class="mobile-card-muted"> · {{ $l->department ?? '—' }}</span></div>
+            <div class="mobile-card-row"><x-icon name="car" :size="14" /> {{ $l->vehicle->model }}</div>
+            <div class="mobile-card-row"><x-icon name="map-pin" :size="14" /> {{ $l->purpose }} @if($l->destination) → {{ $l->destination }} @endif</div>
+            <div class="mobile-card-row">
+                <x-icon name="clock" :size="14" />
+                Keluar {{ $l->checkout_time?->format('H:i') ?? '—' }} ({{ $l->km_out ? number_format($l->km_out) : '—' }} km)
+                @if($l->checkin_time)
+                    · Masuk {{ $l->checkin_time->format('H:i') }} ({{ $l->km_in ? number_format($l->km_in) : '—' }} km)
+                @endif
+            </div>
+            @if($l->checkout_photo || $l->checkin_photo)
+            <div class="mobile-card-row">
+                @if($l->checkout_photo)
+                    <a href="{{ $l->checkout_photo_url }}" target="_blank" title="Gambar keluar">
+                        <img src="{{ $l->checkout_photo_url }}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--c-border)">
+                    </a>
+                @endif
+                @if($l->checkin_photo)
+                    <a href="{{ $l->checkin_photo_url }}" target="_blank" title="Gambar masuk">
+                        <img src="{{ $l->checkin_photo_url }}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1px solid var(--c-border)">
+                    </a>
+                @endif
+            </div>
+            @endif
+            <div class="mobile-card-actions">
+                @if($l->status === 'di_luar')
+                    <button class="btn btn-sm btn-primary" onclick="openCheckin({{ $l->id }}, '{{ $l->vehicle->plat }}', {{ $l->km_out ?? 0 }})">Check-in</button>
+                @elseif($l->km_out && $l->km_in)
+                    <span class="mobile-card-muted" style="font-size:11.5px">{{ $l->km_in - $l->km_out }} km ditempuh</span>
+                @endif
+            </div>
+        </div>
+        @empty
+        <div style="text-align:center;color:var(--c-muted);padding:24px">Tiada rekod pergerakan untuk tarikh ini</div>
+        @endforelse
     </div>
 
     <!-- Checkout Modal -->
