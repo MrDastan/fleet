@@ -27,7 +27,7 @@
         <a href="{{ route('roadtax.index', ['tab' => 'puspakom']) }}" class="tab {{ $tab === 'puspakom' ? 'active' : '' }}">Puspakom</a>
     </div>
 
-    <div class="card">
+    <div class="card table-card-desktop">
         <div class="card-header">
             <span class="card-title">
                 <span class="icon-accent"><x-icon :name="$tab === 'roadtax' ? 'file-text' : ($tab === 'insuran' ? 'shield' : 'clipboard-check')" :size="17" /></span>
@@ -84,6 +84,52 @@
                 @endforeach
             </tbody>
         </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="mobile-cards">
+        <div class="search-bar" style="margin-bottom:12px">
+            <span class="card-title">
+                <span class="icon-accent"><x-icon :name="$tab === 'roadtax' ? 'file-text' : ($tab === 'insuran' ? 'shield' : 'clipboard-check')" :size="17" /></span>
+                @if($tab === 'roadtax') Senarai Road Tax
+                @elseif($tab === 'insuran') Senarai Insuran
+                @else Senarai Puspakom @endif
+            </span>
+            <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="document.getElementById('addRoadtaxModal').classList.add('open')"><x-icon name="plus" :size="15" /> Kemaskini</button>
+        </div>
+        @foreach($vehicles->sortBy(fn($v) => $tab === 'insuran' ? $v->insurance_days : $v->roadtax_days) as $v)
+            @php
+                if ($tab === 'insuran') {
+                    $expiry = $v->insurance_expiry;
+                    $days = $v->insurance_days;
+                } elseif ($tab === 'puspakom') {
+                    $expiry = $v->puspakom_expiry;
+                    $days = $expiry ? (int) now()->diffInDays($expiry, false) : 999;
+                } else {
+                    $expiry = $v->roadtax_expiry;
+                    $days = $v->roadtax_days;
+                }
+                $color = $days <= 7 ? 'var(--c-danger)' : ($days <= 30 ? 'var(--c-warn)' : 'var(--c-ok)');
+            @endphp
+            <div class="mobile-card">
+                <div class="mobile-card-top">
+                    <strong style="font-family:monospace;font-size:12px">{{ $v->plat }}</strong>
+                    @if($days <= 7)<span class="badge-pill badge-danger">Urgent</span>
+                    @elseif($days <= 30)<span class="badge-pill badge-warn">Segera</span>
+                    @else<span class="badge-pill badge-ok">Aktif</span>@endif
+                </div>
+                <div class="mobile-card-main">{{ $v->model }}</div>
+                <div class="mobile-card-row"><x-icon name="calendar" :size="14" /> Luput: {{ $expiry?->format('d M Y') ?? '—' }}</div>
+                <div class="mobile-card-row" style="color:{{ $color }};font-weight:700">{{ $expiry ? $days . ' hari lagi' : '—' }}</div>
+                <div class="mobile-card-actions">
+                    @if($days <= 30)
+                        <button class="btn btn-sm btn-primary" onclick="openRenew({{ $v->id }}, '{{ $v->plat }}', '{{ $tab }}')">Perbaharui</button>
+                    @else
+                        <button class="btn btn-sm btn-secondary" onclick="openRenew({{ $v->id }}, '{{ $v->plat }}', '{{ $tab }}')">Detail</button>
+                    @endif
+                </div>
+            </div>
+        @endforeach
     </div>
 
     @if($records->where('doc_type', $tab)->count())

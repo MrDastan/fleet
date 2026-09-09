@@ -134,7 +134,7 @@
             <span class="card-title"><span class="icon-accent"><x-icon name="settings" :size="17" /></span>Peraturan Pengesanan Anomali</span>
             <span class="badge-pill badge-info">{{ count($rules) }} peraturan aktif</span>
         </div>
-        <div class="card-body">
+        <div class="card-body table-card-desktop" style="padding:0">
             <table class="fleet-table">
                 <thead><tr><th></th><th>Peraturan</th><th>Penerangan</th><th>Tahap</th><th>Ambang</th><th>Status</th></tr></thead>
                 <tbody>
@@ -154,6 +154,26 @@
                     @endforeach
                 </tbody>
             </table>
+        </div>
+
+        <!-- Cards (mobile) -->
+        <div class="mobile-cards card-body" style="padding-top:16px">
+            @foreach($rules as $r)
+            <div class="mobile-card">
+                <div class="mobile-card-top">
+                    <span style="display:flex;align-items:center;gap:8px">
+                        <span style="color:var(--ink-2)"><x-icon :name="$ruleIcons[$r['code']] ?? 'activity'" :size="17" /></span>
+                        <strong style="font-size:13px">{{ $r['name'] }}</strong>
+                    </span>
+                    @if($r['severity'] === 'critical')<span class="badge-pill badge-danger">Kritikal</span>
+                    @elseif($r['severity'] === 'warning')<span class="badge-pill badge-warn">Amaran</span>
+                    @else<span class="badge-pill badge-info">Info</span>@endif
+                </div>
+                <div class="mobile-card-row mobile-card-muted" style="font-family:var(--font-mono)">{{ $r['code'] }}</div>
+                <div class="mobile-card-row">{{ $r['description'] }}</div>
+                <div class="mobile-card-row mobile-card-muted">Ambang: <strong style="color:var(--ink)">{{ $r['threshold'] }}</strong> · <span class="badge-pill badge-ok">Aktif</span></div>
+            </div>
+            @endforeach
         </div>
     </div>
 

@@ -686,6 +686,7 @@ nav#sideNav { padding: 0 12px; flex: 1; }
   .dash-split { flex-direction: column; }
   .table-card-desktop { display: none; }
   .mobile-cards { display: block; }
+  .card-header { flex-wrap: wrap; }
 }
 
 @media (max-width: 380px) {
