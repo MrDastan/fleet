@@ -59,8 +59,19 @@
         <button class="btn btn-primary" onclick="document.getElementById('newApprovalModal').classList.add('open')"><x-icon name="plus" :size="16" /> Mohon Kenderaan</button>
     </div>
 
-    <!-- Table -->
-    <div class="card mb20">
+    @php
+        $stageLabels = [1 => 'Peringkat 1/3', 2 => 'Peringkat 2/3', 3 => 'Peringkat 3/3', 4 => 'Selesai'];
+        $statusBadges = [
+            'pending_guard' => '<span class="badge-pill badge-warn">Menunggu Penjaga</span>',
+            'pending_fleet' => '<span class="badge-pill badge-info">Menunggu Fleet</span>',
+            'approved' => '<span class="badge-pill badge-ok">Diluluskan</span>',
+            'rejected' => '<span class="badge-pill badge-danger">Ditolak</span>',
+            'completed' => '<span class="badge-pill badge-neutral">Selesai</span>',
+        ];
+    @endphp
+
+    <!-- Table (desktop) -->
+    <div class="card mb20 approval-table-card">
         <table class="fleet-table">
             <thead>
                 <tr><th>No.</th><th>Pemohon</th><th>Kenderaan</th><th>Tarikh Guna</th><th>Tujuan</th><th>Peringkat</th><th>Status</th><th>Dihantar</th><th>Tindakan</th></tr>
@@ -68,14 +79,6 @@
             <tbody>
                 @forelse($requests as $a)
                 @php
-                    $stageLabels = [1 => 'Peringkat 1/3', 2 => 'Peringkat 2/3', 3 => 'Peringkat 3/3', 4 => 'Selesai'];
-                    $statusBadges = [
-                        'pending_guard' => '<span class="badge-pill badge-warn">Menunggu Penjaga</span>',
-                        'pending_fleet' => '<span class="badge-pill badge-info">Menunggu Fleet</span>',
-                        'approved' => '<span class="badge-pill badge-ok">Diluluskan</span>',
-                        'rejected' => '<span class="badge-pill badge-danger">Ditolak</span>',
-                        'completed' => '<span class="badge-pill badge-neutral">Selesai</span>',
-                    ];
                     $canGuard = $role === 'guard' && $a->status === 'pending_guard';
                     $canFleet = in_array($role, ['fleet', 'admin']) && $a->status === 'pending_fleet';
                     $canOverride = $role === 'admin' && in_array($a->status, ['pending_guard', 'pending_fleet']);
@@ -113,6 +116,48 @@
                 @endforelse
             </tbody>
         </table>
+    </div>
+
+    <!-- Cards (mobile) -->
+    <div class="approval-cards mb20">
+        @forelse($requests as $a)
+        @php
+            $canGuard = $role === 'guard' && $a->status === 'pending_guard';
+            $canFleet = in_array($role, ['fleet', 'admin']) && $a->status === 'pending_fleet';
+            $canOverride = $role === 'admin' && in_array($a->status, ['pending_guard', 'pending_fleet']);
+            $canComplete = in_array($role, ['admin', 'fleet']) && $a->status === 'approved';
+        @endphp
+        <div class="approval-card">
+            <div class="approval-card-top">
+                <strong style="font-family:monospace;font-size:11px">{{ $a->request_no }}</strong>
+                {!! $statusBadges[$a->status] ?? $a->status !!}
+            </div>
+            <div class="approval-card-main">{{ $a->requester->name }}<span class="approval-card-muted"> · {{ $a->requester->department }}</span></div>
+            <div class="approval-card-row"><x-icon name="car" :size="14" /> <strong>{{ $a->vehicle->plat }}</strong> — {{ $a->vehicle->model }}</div>
+            <div class="approval-card-row"><x-icon name="calendar" :size="14" /> {{ $a->use_date->format('d M Y') }}, {{ $a->time_start }} – {{ $a->time_end }}</div>
+            <div class="approval-card-row"><x-icon name="map-pin" :size="14" /> {{ $a->purpose }} → {{ $a->destination }}</div>
+            <div class="approval-card-row approval-card-muted">{{ $stageLabels[$a->stage] ?? '' }} · Dihantar {{ $a->created_at->format('d M, H:i') }}</div>
+            <div class="approval-card-actions">
+                <button class="btn btn-sm btn-secondary" onclick="viewDetail({{ $a->id }})">Detail</button>
+                @if($canGuard)
+                    <button class="btn btn-sm btn-primary" onclick="openGuardModal({{ $a->id }})">Semak</button>
+                @endif
+                @if($canFleet)
+                    <button class="btn btn-sm btn-primary" onclick="openFleetModal({{ $a->id }})">Nilai</button>
+                @endif
+                @if($canOverride)
+                    <button class="btn btn-sm" style="background:#7c3aed;color:#fff" onclick="openOverrideModal({{ $a->id }})"><x-icon name="zap" :size="13" /> Override</button>
+                @endif
+                @if($canComplete)
+                    <form method="POST" action="{{ route('approvals.complete', $a) }}">@csrf @method('PUT')
+                        <button class="btn btn-sm btn-secondary" type="submit"><x-icon name="flag" :size="13" /> Selesai</button>
+                    </form>
+                @endif
+            </div>
+        </div>
+        @empty
+        <div style="text-align:center;color:var(--c-muted);padding:24px">Tiada permohonan</div>
+        @endforelse
     </div>
 
     <!-- Flow chart -->
