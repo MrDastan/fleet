@@ -1,6 +1,10 @@
 <?php
 
 return [
+    // Order of preference when a user has more than one role, used to pick
+    // which sidebar/nav to show and which role reads as "primary" in the UI.
+    'role_priority' => ['admin', 'fleet', 'staff', 'guard'],
+
     'nav' => [
         'admin' => [
             ['section' => 'UTAMA', 'items' => [

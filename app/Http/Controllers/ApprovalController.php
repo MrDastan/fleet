@@ -14,7 +14,7 @@ class ApprovalController extends Controller
     public function index(Request $request)
     {
         $query = VehicleRequest::with(['requester', 'vehicle']);
-        $role = auth()->user()->roles->first()?->name ?? 'staff';
+        $role = auth()->user()->primaryRoleName();
 
         if ($status = $request->input('status')) {
             $query->where('status', $status);

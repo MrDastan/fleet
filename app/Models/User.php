@@ -41,4 +41,17 @@ class User extends Authenticatable
             'is_active' => 'boolean',
         ];
     }
+
+    public function primaryRoleName(): string
+    {
+        $names = $this->roles->pluck('name');
+
+        foreach (config('fleet.role_priority', []) as $role) {
+            if ($names->contains($role)) {
+                return $role;
+            }
+        }
+
+        return $names->first() ?? 'staff';
+    }
 }

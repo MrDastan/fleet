@@ -38,7 +38,8 @@ class UserController extends Controller
             'department' => 'nullable|string',
             'position' => 'nullable|string',
             'phone' => 'nullable|string',
-            'role' => 'required|exists:roles,name',
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'exists:roles,name',
         ]);
 
         $initials = collect(explode(' ', $validated['name']))
@@ -57,7 +58,7 @@ class UserController extends Controller
             'pin' => '123456',
         ]);
 
-        $user->assignRole($validated['role']);
+        $user->syncRoles($validated['roles']);
 
         return redirect()->route('users.index')->with('success', 'Pengguna baharu ditambah.');
     }
@@ -71,12 +72,13 @@ class UserController extends Controller
             'position' => 'nullable|string',
             'phone' => 'nullable|string',
             'employee_no' => 'nullable|string',
-            'role' => 'required|exists:roles,name',
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'exists:roles,name',
             'is_active' => 'nullable|boolean',
             'password' => 'nullable|string|min:6',
         ]);
 
-        $data = collect($validated)->except(['role', 'password'])->toArray();
+        $data = collect($validated)->except(['roles', 'password'])->toArray();
         $data['is_active'] = $request->has('is_active');
 
         $initials = collect(explode(' ', $validated['name']))
@@ -89,7 +91,7 @@ class UserController extends Controller
         }
 
         $user->update($data);
-        $user->syncRoles([$validated['role']]);
+        $user->syncRoles($validated['roles']);
 
         return redirect()->route('users.index')->with('success', 'Pengguna dikemaskini.');
     }

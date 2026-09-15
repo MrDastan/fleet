@@ -17,7 +17,7 @@
             <tbody>
                 @foreach($users as $u)
                 @php
-                    $roleName = $u->roles->first()?->name ?? 'staff';
+                    $roleName = $u->primaryRoleName();
                     $roleColors = ['admin' => 'badge-purple', 'fleet' => 'badge-info', 'guard' => 'badge-warn', 'staff' => 'badge-neutral'];
                 @endphp
                 <tr>
@@ -32,7 +32,11 @@
                     </td>
                     <td>{{ $u->position ?? '—' }}</td>
                     <td>{{ $u->department ?? '—' }}</td>
-                    <td><span class="badge-pill {{ $roleColors[$roleName] ?? 'badge-neutral' }}">{{ ucfirst($roleName) }}</span></td>
+                    <td>
+                        @foreach($u->roles as $r)
+                            <span class="badge-pill {{ $roleColors[$r->name] ?? 'badge-neutral' }}" style="margin-right:4px">{{ ucfirst($r->name) }}</span>
+                        @endforeach
+                    </td>
                     <td>
                         @if($u->is_active)<span class="badge-pill badge-ok">Aktif</span>
                         @else<span class="badge-pill badge-danger">Tidak Aktif</span>@endif
@@ -80,10 +84,14 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-label">No. Telefon</label><input name="phone" class="form-control"></div>
-                    <div class="form-group"><label class="form-label">Peranan *</label>
-                        <select name="role" class="form-control" required>
-                            @foreach($roles as $r)<option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>@endforeach
-                        </select>
+                    <div class="form-group"><label class="form-label">Peranan * <span style="font-weight:400;color:var(--c-muted)">(boleh lebih dari satu)</span></label>
+                        <div style="display:flex;flex-wrap:wrap;gap:12px;padding-top:8px">
+                            @foreach($roles as $r)
+                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+                                <input type="checkbox" name="roles[]" value="{{ $r->name }}"> {{ ucfirst($r->name) }}
+                            </label>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -122,10 +130,14 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group"><label class="form-label">No. Telefon</label><input name="phone" id="eu_phone" class="form-control"></div>
-                    <div class="form-group"><label class="form-label">Peranan *</label>
-                        <select name="role" id="eu_role" class="form-control" required>
-                            @foreach($roles as $r)<option value="{{ $r->name }}">{{ ucfirst($r->name) }}</option>@endforeach
-                        </select>
+                    <div class="form-group"><label class="form-label">Peranan * <span style="font-weight:400;color:var(--c-muted)">(boleh lebih dari satu)</span></label>
+                        <div id="eu_roles" style="display:flex;flex-wrap:wrap;gap:12px;padding-top:8px">
+                            @foreach($roles as $r)
+                            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+                                <input type="checkbox" name="roles[]" class="eu_role_cb" value="{{ $r->name }}"> {{ ucfirst($r->name) }}
+                            </label>
+                            @endforeach
+                        </div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -159,7 +171,8 @@
         document.getElementById('eu_department').value = u.department || '';
         document.getElementById('eu_position').value = u.position || '';
         document.getElementById('eu_phone').value = u.phone || '';
-        document.getElementById('eu_role').value = u.roles?.[0]?.name || 'staff';
+        const userRoleNames = (u.roles || []).map(r => r.name);
+        document.querySelectorAll('.eu_role_cb').forEach(cb => { cb.checked = userRoleNames.includes(cb.value); });
         document.getElementById('eu_active').checked = u.is_active;
         document.getElementById('editUserModal').classList.add('open');
     }

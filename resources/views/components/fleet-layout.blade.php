@@ -27,13 +27,13 @@
         <div class="avatar">{{ auth()->user()->avatar_initials ?? 'U' }}</div>
         <div style="min-width:0">
             <div class="name">{{ auth()->user()->name }}</div>
-            <div class="role-name">{{ auth()->user()->position ?? ucfirst(auth()->user()->roles->first()?->name ?? 'User') }}</div>
+            <div class="role-name">{{ auth()->user()->position ?? ucfirst(auth()->user()->primaryRoleName()) }}</div>
         </div>
     </div>
 
     <nav id="sideNav">
         @php
-            $role = auth()->user()->roles->first()?->name ?? 'staff';
+            $role = auth()->user()->primaryRoleName();
             $navConfigs = config('fleet.nav');
             $sections = $navConfigs[$role] ?? $navConfigs['staff'];
         @endphp
