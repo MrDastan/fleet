@@ -10,8 +10,7 @@
         body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--c-navy); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 24px; }
         .login-card { background: #fff; border-radius: 20px; padding: 32px 28px; width: 100%; max-width: 380px; box-shadow: 0 24px 64px rgba(0,0,0,0.3); }
         .login-logo { text-align: center; margin-bottom: 24px; }
-        .login-logo .brand { font-size: 22px; font-weight: 800; letter-spacing: -1px; color: var(--c-navy); }
-        .login-logo .brand span { color: var(--c-sky); }
+        .login-logo .brand-img { display: block; width: 180px; max-width: 100%; height: auto; margin: 0 auto; }
         .system-name { font-size: 13px; color: var(--c-muted); margin-top: 6px; }
         .login-title { font-size: 20px; font-weight: 700; color: var(--c-navy); margin-bottom: 4px; text-align: center; }
         .login-sub { font-size: 12px; color: var(--c-muted); text-align: center; margin-bottom: 22px; }
@@ -33,7 +32,7 @@
 <body>
     <div class="login-card">
         <div class="login-logo">
-            <div class="brand">MSD<span>.</span></div>
+            <img class="brand-img" src="{{ asset('images/msd-logo-login.png') }}" alt="MSD Digital Intelligence">
             <div class="system-name">Sistem Pengurusan Kenderaan</div>
         </div>
 

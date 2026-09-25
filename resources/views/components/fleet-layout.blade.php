@@ -16,7 +16,7 @@
 <!-- SIDEBAR -->
 <aside class="sidebar" id="sidebar">
     <div class="sidebar-logo">
-        <div class="sidebar-logo-mark">M</div>
+        <div class="sidebar-logo-mark"><img src="{{ asset('images/msd-logo.png') }}" alt="MSD"></div>
         <div>
             <div class="sidebar-logo-text">MSD<span>.</span>Fleet</div>
             <div class="sidebar-sub">Pengurusan Kenderaan</div>
