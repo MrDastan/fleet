@@ -177,6 +177,7 @@ class DemoDataSeeder extends Seeder
                     'requester_user_id' => $r['requester']->id,
                     'vehicle_id' => $v->id,
                     'use_date' => $r['date'],
+                    'return_date' => $r['date'],
                     'time_start' => $r['start'],
                     'time_end' => $r['end'],
                     'purpose' => $r['purpose'],

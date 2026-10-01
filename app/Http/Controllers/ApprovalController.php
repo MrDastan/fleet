@@ -49,6 +49,7 @@ class ApprovalController extends Controller
         $validated = $request->validate([
             'vehicle_id' => 'required|exists:vehicles,id',
             'use_date' => 'required|date',
+            'return_date' => 'required|date|after_or_equal:use_date',
             'time_start' => 'required',
             'time_end' => 'required',
             'purpose' => 'required|string',

@@ -88,7 +88,7 @@
                     <td><strong style="font-family:monospace;font-size:11px">{{ $a->request_no }}</strong></td>
                     <td><strong>{{ $a->requester->name }}</strong><div style="font-size:11px;color:var(--c-muted)">{{ $a->requester->department }}</div></td>
                     <td><strong>{{ $a->vehicle->plat }}</strong><div style="font-size:11px;color:var(--c-muted)">{{ $a->vehicle->model }}</div></td>
-                    <td>{{ $a->use_date->format('d M Y') }}<div style="font-size:11px;color:var(--c-muted)">{{ $a->time_start }} – {{ $a->time_end }}</div></td>
+                    <td>{{ $a->use_date->format('d M Y') }}<div style="font-size:11px;color:var(--c-muted)">Pulang: {{ ($a->return_date ?? $a->use_date)->format('d M Y') }}</div><div style="font-size:11px;color:var(--c-muted)">{{ $a->time_start }} – {{ $a->time_end }}</div></td>
                     <td>{{ $a->purpose }}<div style="font-size:11px;color:var(--c-muted)">{{ $a->destination }}</div></td>
                     <td><span style="font-size:11px;color:var(--c-muted)">{{ $stageLabels[$a->stage] ?? '' }}</span></td>
                     <td>{!! $statusBadges[$a->status] ?? $a->status !!}</td>
@@ -134,7 +134,7 @@
             </div>
             <div class="mobile-card-main">{{ $a->requester->name }}<span class="mobile-card-muted"> · {{ $a->requester->department }}</span></div>
             <div class="mobile-card-row"><x-icon name="car" :size="14" /> <strong>{{ $a->vehicle->plat }}</strong> — {{ $a->vehicle->model }}</div>
-            <div class="mobile-card-row"><x-icon name="calendar" :size="14" /> {{ $a->use_date->format('d M Y') }}, {{ $a->time_start }} – {{ $a->time_end }}</div>
+            <div class="mobile-card-row"><x-icon name="calendar" :size="14" /> {{ $a->use_date->format('d M Y') }}, {{ $a->time_start }} – {{ ($a->return_date ?? $a->use_date)->format('d M Y') }}, {{ $a->time_end }}</div>
             <div class="mobile-card-row"><x-icon name="map-pin" :size="14" /> {{ $a->purpose }} → {{ $a->destination }}</div>
             <div class="mobile-card-row mobile-card-muted">{{ $stageLabels[$a->stage] ?? '' }} · Dihantar {{ $a->created_at->format('d M, H:i') }}</div>
             <div class="mobile-card-actions">
@@ -213,10 +213,12 @@
                     </select>
                 </div>
                 <div class="form-row">
-                    <div class="form-group"><label class="form-label">Tarikh Guna *</label><input name="use_date" class="form-control" type="date" required value="{{ date('Y-m-d') }}"></div>
-                    <div class="form-group"><label class="form-label">Masa Mula — Jangka Pulang</label>
-                        <div style="display:flex;gap:6px"><input name="time_start" class="form-control" type="time" required value="08:00" style="flex:1"><input name="time_end" class="form-control" type="time" required value="17:00" style="flex:1"></div>
-                    </div>
+                    <div class="form-group"><label class="form-label">Tarikh Guna *</label><input name="use_date" id="useDate" class="form-control" type="date" required value="{{ date('Y-m-d') }}" onchange="syncReturnDate()"></div>
+                    <div class="form-group"><label class="form-label">Masa Mula *</label><input name="time_start" class="form-control" type="time" required value="08:00"></div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group"><label class="form-label">Tarikh Pulang *</label><input name="return_date" id="returnDate" class="form-control" type="date" required value="{{ date('Y-m-d') }}" min="{{ date('Y-m-d') }}"></div>
+                    <div class="form-group"><label class="form-label">Masa Jangka Pulang *</label><input name="time_end" class="form-control" type="time" required value="17:00"></div>
                 </div>
                 <div class="form-group"><label class="form-label">Tujuan Perjalanan *</label>
                     <select name="purpose" class="form-control" required>
@@ -338,10 +340,17 @@
     <script>
     const approvalData = @json($requests->keyBy('id'));
 
+    function syncReturnDate() {
+        const use = document.getElementById('useDate').value;
+        const ret = document.getElementById('returnDate');
+        ret.min = use;
+        if (!ret.value || ret.value < use) ret.value = use;
+    }
+
     function approvalSummary(a) {
         return `<strong>${a.requester.name}</strong> (${a.requester.department ?? '—'}) memohon
-            <strong>${a.vehicle.plat}</strong> pada ${a.use_date.split('T')[0]}
-            (${a.time_start}–${a.time_end}) untuk <em>${a.purpose}</em> ke ${a.destination}.`;
+            <strong>${a.vehicle.plat}</strong> dari ${a.use_date.split('T')[0]} (${a.time_start})
+            hingga ${(a.return_date || a.use_date).split('T')[0]} (${a.time_end}) untuk <em>${a.purpose}</em> ke ${a.destination}.`;
     }
 
     function openGuardModal(id) {
@@ -379,7 +388,8 @@
             <div class="detail-row"><div class="detail-label">No. Permohonan</div><div class="detail-val"><strong style="font-family:monospace">${a.request_no}</strong></div></div>
             <div class="detail-row"><div class="detail-label">Pemohon</div><div class="detail-val">${a.requester.name} (${a.requester.department || '—'})</div></div>
             <div class="detail-row"><div class="detail-label">Kenderaan</div><div class="detail-val">${a.vehicle.plat} — ${a.vehicle.model}</div></div>
-            <div class="detail-row"><div class="detail-label">Tarikh</div><div class="detail-val">${a.use_date.split('T')[0]}</div></div>
+            <div class="detail-row"><div class="detail-label">Tarikh Guna</div><div class="detail-val">${a.use_date.split('T')[0]}</div></div>
+            <div class="detail-row"><div class="detail-label">Tarikh Pulang</div><div class="detail-val">${(a.return_date || a.use_date).split('T')[0]}</div></div>
             <div class="detail-row"><div class="detail-label">Masa</div><div class="detail-val">${a.time_start} – ${a.time_end}</div></div>
             <div class="detail-row"><div class="detail-label">Tujuan</div><div class="detail-val">${a.purpose}</div></div>
             <div class="detail-row"><div class="detail-label">Destinasi</div><div class="detail-val">${a.destination}</div></div>
