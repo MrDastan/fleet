@@ -89,7 +89,6 @@ h1, h2, h3 { font-family: var(--font-display); }
   align-items: center;
   gap: 11px;
 }
-.sidebar-logo img { display: none; }
 .sidebar-logo-mark {
   height: 34px; padding: 0 6px; border-radius: 9px;
   background: #fff;
